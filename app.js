@@ -28,7 +28,7 @@ const SOUNDS = {
     rae3Jedd:     { file: 'sounds/Rae3-jeddn.mp3',     text: 'رائع جداً' },
     ejabaSaheha:  { file: 'sounds/Ejaba-saheha.mp3',   text: 'إجابة صحيحة' },
     yaBatal:      { file: 'sounds/Ya-batal.mp3',       text: 'يا بطل' },
-    elaAlamam:    { file: 'sounds/Ela-alemam.mp3',     text: 'إلى الأمام' },
+    elaAlamam:    { file: 'sounds/Ela-alamam.mp3',     text: 'إلى الأمام' },
     to3gebony:    { file: 'sounds/To3gebony.mp3',      text: 'تعجبني' }
 };
 
