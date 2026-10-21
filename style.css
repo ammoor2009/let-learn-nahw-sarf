@@ -1,5 +1,5 @@
 /* ==========================================
-   النحو الميسّر — تنسيقات مخصصة
+   لنتعلم قواعد النحو والصرف — تنسيقات مخصصة
    ========================================== */
 
 body { font-family: 'Cairo', sans-serif; }
@@ -23,3 +23,11 @@ body { font-family: 'Cairo', sans-serif; }
 
 .timer-bar { transition: width 1s linear, background-color 0.3s ease; }
 .option-btn:disabled { cursor: not-allowed; }
+
+/* لضمان عمل قص النصوص بشكل صحيح */
+.line-clamp-2 {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
