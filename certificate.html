@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>شهادة الإنجاز — النحو الميسّر</title>
+    <title>شهادة الإنجاز — لنتعلم قواعد النحو والصرف</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&family=Amiri:wght@400;700&family=Aref+Ruqaa:wght@400;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -200,7 +200,7 @@
                             <i class="fa-solid fa-graduation-cap" style="color: white; font-size: 18px;"></i>
                         </div>
                         <div style="text-align: right;">
-                            <h2 style="font-size: 14px; font-weight: 900; color: #065f46; margin: 0;">النحو الميسّر</h2>
+                            <h2 style="font-size: 14px; font-weight: 900; color: #065f46; margin: 0;">لنتعلم قواعد النحو والصرف</h2>
                             <p style="font-size: 8px; color: #78716c; margin: 0;">المنصة الأكاديمية التفاعلية</p>
                         </div>
                     </div>
@@ -223,7 +223,7 @@
                     </div>
 
                     <p id="cert-message" style="font-size: 12px; color: #44403c; line-height: 1.7; max-width: 200mm; margin: 3mm auto;">
-                        في رحلته التعليمية على منصة <strong style="color: #92400e;">النحو الميسّر</strong>، أظهر الطالب التزامًا وجهدًا يستحقان التقدير.
+                        في رحلته التعليمية على منصة <strong style="color: #92400e;">لنتعلم قواعد النحو والصرف</strong>، أظهر الطالب التزامًا وجهدًا يستحقان التقدير.
                     </p>
                 </div>
 
@@ -241,12 +241,12 @@
                 <!-- Stats -->
                 <div class="flex justify-center gap-8" style="margin: 4mm 0;">
                     <div style="text-align: center;">
-                        <div id="stat-levels" style="font-size: 22px; font-weight: 900; color: #b8860b; font-family: 'Amiri', serif;" dir="ltr">0 / 270</div>
+                        <div id="stat-levels" style="font-size: 22px; font-weight: 900; color: #b8860b; font-family: 'Amiri', serif;" dir="ltr">0 / 40</div>
                         <div style="font-size: 9px; color: #78716c;">مستوى مُنجَز</div>
                     </div>
                     <div style="width: 1px; background: #d4af37;"></div>
                     <div style="text-align: center;">
-                        <div id="stat-stages" style="font-size: 22px; font-weight: 900; color: #b8860b; font-family: 'Amiri', serif;" dir="ltr">0 / 26</div>
+                        <div id="stat-stages" style="font-size: 22px; font-weight: 900; color: #b8860b; font-family: 'Amiri', serif;" dir="ltr">0 / 20</div>
                         <div style="font-size: 9px; color: #78716c;">مرحلة مكتملة</div>
                     </div>
                     <div style="width: 1px; background: #d4af37;"></div>
@@ -312,27 +312,43 @@
     </div>
 
     <script>
-        const STORAGE_KEY = 'nahw_game_state';
-        const TOTAL_LEVELS = 270;
-        const TOTAL_STAGES = 26;
+        const STORAGE_KEY = 'let_learn_nahw_sarf_state_v3';
+        const TOTAL_LEVELS = 40; // 20 مرحلة × مستويان
+        const TOTAL_STAGES = 20;
 
         const BADGES = [
-            { id: 1, title: "درع البداية المضيئة", rank: "مبتدئ واعد", icon: "fa-seedling", color: "#92400e", range: [1, 5], message: "خطوتك الأولى هي أساس كل نجاح عظيم! لقد أضاءت بدايتك عتمة التردد، فاستمر بهذا العزم المنير." },
-            { id: 2, title: "درع سفير الحروف", rank: "سفير اللسان", icon: "fa-feather", color: "#c2410c", range: [6, 10], message: "لقد عبرت البدايات وأثبتَّ جدارتك؛ كلماتك تتصاعد بثبات، ومعرفتك تتسع يوماً بعد يوم. إلى الأمام!" },
-            { id: 3, title: "درع بطل المعرفة", rank: "فارس المعرفة المتمكن", icon: "fa-shield-halved", color: "#475569", range: [11, 15], message: "تجاوزت منتصف الطريق باقتدار! عزيمتك الصلبة تصنع منك بطلًا حقيقيًا لا يعرف اليأس ولا الاستسلام." },
-            { id: 4, title: "درع الحكيم اللغوي", rank: "حارس القواعد", icon: "fa-crown", color: "#a16207", range: [16, 20], message: "عقلك الراجح وفكرك الثاقب يؤكدان أنك قُمت ببناء قاعدة صلبة من المهارات. لم يبقَ إلا القليل لتصل للقمة!" },
-            { id: 5, title: "درع فارس الميدان", rank: "عميد الفرسان", icon: "fa-medal", color: "#ca8a04", range: [21, 25], message: "أنت على أعتاب القمة الكبرى! شجاعتك في اجتياز هذه المراحل المعقدة تؤهلك لتكون الأبرز بين زملائك." },
-            { id: 6, title: "درع الأسطورة", rank: "بطل الأبطال الأوحد", icon: "fa-gem", color: "#0891b2", range: [26, 26], message: "المجد لمن صبر واجتهد! لقد أتممت الـ 270 مستوى وتجاوزت التحدي الأكبر بجدارة واستحقاق مطلق. أنت الآن أسطورة تُخلَّد في سجل الفرسان الأوائل!" }
+            { id: 1, title: "درع البداية المضيئة", rank: "مبتدئ واعد", icon: "fa-seedling", color: "#92400e", range: [1, 4], message: "خطوتك الأولى هي أساس كل نجاح عظيم! لقد أضاءت بدايتك عتمة التردد، فاستمر بهذا العزم المنير." },
+            { id: 2, title: "درع سفير الحروف", rank: "سفير اللسان", icon: "fa-feather", color: "#c2410c", range: [5, 8], message: "لقد عبرت البدايات وأثبتَّ جدارتك؛ كلماتك تتصاعد بثبات، ومعرفتك تتسع يوماً بعد يوم. إلى الأمام!" },
+            { id: 3, title: "درع بطل المعرفة", rank: "فارس المعرفة المتمكن", icon: "fa-shield-halved", color: "#475569", range: [9, 12], message: "تجاوزت منتصف الطريق باقتدار! عزيمتك الصلبة تصنع منك بطلًا حقيقيًا لا يعرف اليأس ولا الاستسلام." },
+            { id: 4, title: "درع الحكيم اللغوي", rank: "حارس القواعد", icon: "fa-crown", color: "#a16207", range: [13, 16], message: "عقلك الراجح وفكرك الثاقب يؤكدان أنك قُمت ببناء قاعدة صلبة من المهارات. لم يبقَ إلا القليل لتصل للقمة!" },
+            { id: 5, title: "درع فارس الميدان", rank: "عميد الفرسان", icon: "fa-medal", color: "#ca8a04", range: [17, 19], message: "أنت على أعتاب القمة الكبرى! شجاعتك في اجتياز هذه المراحل المعقدة تؤهلك لتكون الأبرز بين زملائك." },
+            { id: 6, title: "درع الأسطورة", rank: "بطل الأبطال الأوحد", icon: "fa-gem", color: "#0891b2", range: [20, 20], message: "المجد لمن صبر واجتهد! لقد أتممت الـ 200 سؤال وتجاوزت التحدي الأكبر بجدارة واستحقاق مطلق. أنت الآن أسطورة تُخلَّد في سجل الفرسان الأوائل!" }
         ];
 
         function getTotalLevelsCompleted(state) {
             let total = 0;
-            if (state.stageProgress) {
-                for (const sid in state.stageProgress) {
-                    if (state.stageProgress[sid] && state.stageProgress[sid].completedLevels) {
-                        total += state.stageProgress[sid].completedLevels.length;
+            if (state.tracks) {
+                ['nahw', 'sarf'].forEach(track => {
+                    if (state.tracks[track] && state.tracks[track].stageProgress) {
+                        for (const sid in state.tracks[track].stageProgress) {
+                            if (state.tracks[track].stageProgress[sid] && state.tracks[track].stageProgress[sid].completedLevels) {
+                                total += state.tracks[track].stageProgress[sid].completedLevels.length;
+                            }
+                        }
                     }
-                }
+                });
+            }
+            return total;
+        }
+
+        function getTotalStagesCompleted(state) {
+            let total = 0;
+            if (state.tracks) {
+                ['nahw', 'sarf'].forEach(track => {
+                    if (state.tracks[track] && state.tracks[track].completedStages) {
+                        total += state.tracks[track].completedStages.length;
+                    }
+                });
             }
             return total;
         }
@@ -361,7 +377,7 @@
             }
 
             const completedLevels = getTotalLevelsCompleted(state);
-            const completedStages = (state.completedStages || []).length;
+            const completedStages = getTotalStagesCompleted(state);
             const percent = Math.round((completedLevels / TOTAL_LEVELS) * 100);
             const isComplete = completedStages >= TOTAL_STAGES;
             const currentBadge = getCurrentBadge(completedStages);
@@ -371,10 +387,10 @@
 
             if (isComplete) {
                 document.getElementById('cert-message').innerHTML = 
-                    'تقديراً لما أبداه من جهدٍ متميّز وإصرارٍ على إتمام رحلة تعلّم قواعد اللغة العربية، وإتمامه كامل مستويات منصة <strong style="color: #92400e;">النحو الميسّر</strong> الـ 270 مستوى عبر 26 مرحلة نحوية، وإثباته جدارةً حقيقية بالتفوق والإتقان.';
+                    'تقديراً لما أبداه من جهدٍ متميّز وإصرارٍ على إتمام رحلة تعلّم قواعد اللغة العربية، وإتمامه كامل مستويات منصة <strong style="color: #92400e;">لنتعلم قواعد النحو والصرف</strong> (النحو والصرف)، وإثباته جدارةً حقيقية بالتفوق والإتقان.';
             } else {
                 document.getElementById('cert-message').innerHTML = 
-                    'تقديراً لما أبداه من جهدٍ ملموس في رحلته التعليمية على منصة <strong style="color: #92400e;">النحو الميسّر</strong>، وما حققه من تقدم حتى الآن. نتمنى له دوام التوفيق لإتمام الرحلة كاملة والحصول على شهادة التتويج الكبرى.';
+                    'تقديراً لما أبداه من جهدٍ ملموس في رحلته التعليمية على منصة <strong style="color: #92400e;">لنتعلم قواعد النحو والصرف</strong>، وما حققه من تقدم حتى الآن في مساري النحو والصرف. نتمنى له دوام التوفيق لإتمام الرحلة كاملة والحصول على شهادة التتويج الكبرى.';
             }
 
             document.getElementById('percent-display').textContent = `${percent}%`;
