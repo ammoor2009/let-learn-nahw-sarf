@@ -1,7 +1,9 @@
 /* ============================================================
-   لنتعلم قواعد النحو والصرف — المنطق الرئيسي (v3.1)
-   نظام المسارين + مراجعة الأخطاء + حساب التقدم الديناميكي
+   لنتعلم قواعد النحو والصرف — المنطق الرئيسي + المزامنة السحابية
    ============================================================ */
+
+// ==================== رابط جوجل شيت (Web App URL) ====================
+const WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbxW-oj2TQlqJBOjTKcHomK0Y_OhVDj3cdh87zBrWFgd4DYQ7RPcOsuxkKLv1FEm5CbB/exec';
 
 const CONFIG = {
     MAX_HEARTS: 20,
@@ -15,6 +17,7 @@ const CONFIG = {
 };
 const RESET_CODE = "فيلادلفيا";
 
+// ==================== الأصوات ====================
 const SOUNDS = {
     ahsant:       { file: 'sounds/Ahsant.mp3',         text: 'أحسنت' },
     momtaz:       { file: 'sounds/Momtaz.mp3',         text: 'ممتاز' },
@@ -73,7 +76,7 @@ function playErrorSound() {
     } catch (e) { }
 }
 
-// ==================== نظام الدروع (ديناميكي) ====================
+// ==================== نظام الدروع ====================
 const BADGES = [
     { id: 1, title: "درع البداية المضيئة", rank: "مبتدئ واعد", color: "from-amber-700 to-amber-900", icon: "fa-seedling", minPercent: 1, maxPercent: 20, message: "خطوتك الأولى هي أساس كل نجاح عظيم! لقد أضاءت بدايتك عتمة التردد، فاستمر بهذا العزم المنير." },
     { id: 2, title: "درع سفير الحروف", rank: "سفير اللسان", color: "from-orange-600 to-amber-800", icon: "fa-feather", minPercent: 21, maxPercent: 40, message: "لقد عبرت البدايات وأثبتَّ جدارتك؛ كلماتك تتصاعد بثبات، ومعرفتك تتسع يوماً بعد يوم. إلى الأمام!" },
@@ -121,7 +124,6 @@ function loadSavedState() {
 
 function saveState() {
     gameState.version = CONFIG.STATE_VERSION;
-    // حفظ الإحصائيات الديناميكية لكي تقرأها الشهادة
     gameState.meta = {
         totalNahwQuestions: getTrackStats('nahw').totalQ,
         totalSarfQuestions: getTrackStats('sarf').totalQ,
@@ -133,21 +135,18 @@ function saveState() {
     localStorage.setItem(CONFIG.STORAGE_KEY, JSON.stringify(gameState));
 }
 
-// ==================== دوال حساب التقدم الديناميكية ====================
+// ==================== دوال حساب التقدم ====================
 function getTrackStats(track) {
-    let totalQ = 0;
-    let doneQ = 0;
+    let totalQ = 0; let doneQ = 0;
     let totalStages = window.stagesDatabase[track] ? window.stagesDatabase[track].length : 0;
     let completedStages = gameState.tracks[track].completedStages.length;
 
-    // حساب إجمالي الأسئلة في هذا المسار
     if (window.stagesDatabase[track]) {
         window.stagesDatabase[track].forEach(stage => {
             stage.levels.forEach(lvl => { totalQ += lvl.questions.length; });
         });
     }
 
-    // حساب الأسئلة التي تم حلها (التي أتم مستوياتها)
     for (let stageId in gameState.tracks[track].stageProgress) {
         let stage = window.stagesDatabase[track] ? window.stagesDatabase[track].find(s => s.id == stageId) : null;
         if (stage) {
@@ -165,14 +164,10 @@ function getTotalCompletedStages() {
 }
 
 function getCurrentBadge() {
-    const nahw = getTrackStats('nahw');
-    const sarf = getTrackStats('sarf');
-    const totalStages = nahw.totalStages + sarf.totalStages;
+    const totalStages = window.stagesDatabase.nahw.length + window.stagesDatabase.sarf.length;
     if (totalStages === 0) return null;
-    
     const completedStages = getTotalCompletedStages();
     if (completedStages === 0) return null;
-    
     const percent = (completedStages / totalStages) * 100;
     for (let i = BADGES.length - 1; i >= 0; i--) {
         if (percent >= BADGES[i].minPercent) return BADGES[i];
@@ -188,9 +183,7 @@ function generateUUID() {
 
 // ==================== القلوب ====================
 function regenHearts() {
-    if (gameState.hearts >= CONFIG.MAX_HEARTS) {
-        gameState.lastHeartRegenTime = Date.now(); return;
-    }
+    if (gameState.hearts >= CONFIG.MAX_HEARTS) { gameState.lastHeartRegenTime = Date.now(); return; }
     const elapsed = Date.now() - gameState.lastHeartRegenTime;
     if (elapsed >= CONFIG.HEART_REGEN_MS) {
         const cycles = Math.floor(elapsed / CONFIG.HEART_REGEN_MS);
@@ -320,7 +313,7 @@ function goToCurrentTrackMap() {
     else goToDashboard();
 }
 
-// ==================== شريط التقدم الديناميكي ====================
+// ==================== شريط التقدم ====================
 function renderProgressBar() {
     const nahw = getTrackStats('nahw');
     const sarf = getTrackStats('sarf');
@@ -466,7 +459,7 @@ function renderTrainingTopics() {
     });
 }
 
-// ==================== منطق الاختبار (المحرك الديناميكي) ====================
+// ==================== منطق الاختبار ====================
 let currentStageData = null;
 let mainQuestionsPool = [];   
 let reviewQuestionsPool = []; 
@@ -475,6 +468,7 @@ let questionTimerInterval = null;
 let questionTimeLeft = CONFIG.QUESTION_TIME;
 let isProcessingAnswer = false;
 let currentQuestionSource = 'main'; 
+let questionStartTime = 0;
 
 function startStageQuiz(stageId) {
     regenHearts();
@@ -531,6 +525,7 @@ function loadQuizQuestion() {
 
     const qData = currentQuestion;
     questionTimeLeft = CONFIG.QUESTION_TIME;
+    questionStartTime = Date.now(); // تسجيل وقت بداية السؤال
     updateQuestionTimerUI();
     startQuestionTimer();
 
@@ -615,6 +610,20 @@ function handleTimeOut() {
         if (!reviewQuestionsPool.includes(qData)) reviewQuestionsPool.push(qData);
     }
 
+    // إرسال المحاولة (انتهاء وقت) للسحابة
+    queueAttempt({
+        student_id: gameState.uuid || 'N/A',
+        student_name: gameState.studentName,
+        track: gameState.currentTrack,
+        stage_id: gameState.currentStageId,
+        stage_title: currentStageData.title,
+        question_text: qData.q,
+        selected_answer: "انتهى الوقت",
+        correct_answer: qData.options[qData.answer],
+        is_correct: false,
+        response_time: CONFIG.QUESTION_TIME
+    });
+
     const box = document.getElementById('quiz-feedback-box');
     document.getElementById('feedback-header').innerHTML = `<i class="fa-solid fa-clock text-rose-400"></i> <span class="text-rose-300">انتهى الوقت! سيُضاف للمراجعة — خُصم قلب</span>`;
     document.getElementById('feedback-explanation').textContent = `الإجابة الصحيحة: "${qData.options[qData.answer]}".\n${qData.explanation}`;
@@ -636,6 +645,7 @@ function submitAnswer(selectedIndex, selectedButton) {
     const qData = currentQuestion;
     const buttons = disableOptions();
     const box = document.getElementById('quiz-feedback-box');
+    const responseTime = Math.round((Date.now() - questionStartTime) / 1000); // بالثواني
 
     if (selectedIndex === qData.answer) {
         selectedButton.classList.remove('bg-slate-800/80', 'border-slate-700');
@@ -682,6 +692,20 @@ function submitAnswer(selectedIndex, selectedButton) {
         document.getElementById('feedback-explanation').textContent = `الإجابة الصحيحة: "${qData.options[qData.answer]}".\n${qData.explanation}`;
         document.getElementById('feedback-training-tip').classList.remove('hidden');
     }
+
+    // إرسال المحاولة للسحابة
+    queueAttempt({
+        student_id: gameState.uuid || 'N/A',
+        student_name: gameState.studentName,
+        track: gameState.currentTrack,
+        stage_id: gameState.currentStageId,
+        stage_title: currentStageData.title,
+        question_text: qData.q,
+        selected_answer: qData.options[selectedIndex],
+        correct_answer: qData.options[qData.answer],
+        is_correct: (selectedIndex === qData.answer),
+        response_time: responseTime
+    });
 
     document.getElementById('streak-counter').textContent = gameState.streak;
     box.classList.remove('hidden');
@@ -847,4 +871,86 @@ window.addEventListener('load', function () {
     } else {
         if (lockIcon) lockIcon.classList.add('hidden');
     }
+    
+    // تشغيل المزامنة عند فتح الصفحة
+    processSyncQueue();
 });
+
+// ============================================================
+// 🚀 كود المزامنة مع Google Sheets ونظام IndexedDB
+// ============================================================
+
+const DB_NAME = 'NahwSarfQueue';
+const STORE_NAME = 'attempts_queue';
+
+function initSyncDB() {
+    return new Promise((resolve, reject) => {
+        const request = indexedDB.open(DB_NAME, 1);
+        request.onupgradeneeded = (e) => {
+            const db = e.target.result;
+            if (!db.objectStoreNames.contains(STORE_NAME)) {
+                db.createObjectStore(STORE_NAME, { keyPath: 'event_id' });
+            }
+        };
+        request.onsuccess = (e) => resolve(e.target.result);
+        request.onerror = (e) => reject(e.target.error);
+    });
+}
+
+async function queueAttempt(attemptData) {
+    try {
+        const db = await initSyncDB();
+        const tx = db.transaction(STORE_NAME, 'readwrite');
+        const store = tx.objectStore(STORE_NAME);
+        
+        attemptData.event_id = crypto.randomUUID ? crypto.randomUUID() : Date.now().toString() + Math.random().toString(36).substr(2, 9);
+        attemptData.app_version = CONFIG.STATE_VERSION;
+        
+        store.put(attemptData);
+        
+        tx.oncomplete = () => {
+            processSyncQueue();
+        };
+    } catch (error) {
+        console.error("❌ فشل حفظ المحاولة محلياً:", error);
+    }
+}
+
+async function processSyncQueue() {
+    if (!navigator.onLine) return;
+
+    try {
+        const db = await initSyncDB();
+        const tx = db.transaction(STORE_NAME, 'readonly');
+        const store = tx.objectStore(STORE_NAME);
+        const getAllRequest = store.getAll();
+
+        getAllRequest.onsuccess = async () => {
+            const attempts = getAllRequest.result;
+            if (attempts.length === 0) return;
+
+            for (const attempt of attempts) {
+                try {
+                    await fetch(WEB_APP_URL, {
+                        method: 'POST',
+                        mode: 'no-cors',
+                        headers: { 'Content-Type': 'text/plain' },
+                        body: JSON.stringify(attempt)
+                    });
+
+                    const deleteTx = db.transaction(STORE_NAME, 'readwrite');
+                    deleteTx.objectStore(STORE_NAME).delete(attempt.event_id);
+                    
+                } catch (err) {
+                    console.warn("⚠️ فشل الإرسال، ستبقى المحاولة في قائمة الانتظار:", err);
+                    break; 
+                }
+            }
+        };
+    } catch (error) {
+        console.error("❌ خطأ في عملية المزامنة:", error);
+    }
+}
+
+// استماع لعودة الإنترنت
+window.addEventListener('online', processSyncQueue);
