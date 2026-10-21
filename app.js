@@ -79,7 +79,7 @@ function playErrorSound() {
     } catch (e) { }
 }
 
-// ==================== نظام الدروع (مُعدل للمسارين) ====================
+// ==================== نظام الدروع ====================
 const BADGES = [
     { id: 1, title: "درع البداية المضيئة", rank: "مبتدئ واعد", color: "from-amber-700 to-amber-900", icon: "fa-seedling", range: [1, 4], message: "خطوتك الأولى هي أساس كل نجاح عظيم! لقد أضاءت بدايتك عتمة التردد، فاستمر بهذا العزم المنير." },
     { id: 2, title: "درع سفير الحروف", rank: "سفير اللسان", color: "from-orange-600 to-amber-800", icon: "fa-feather", range: [5, 8], message: "لقد عبرت البدايات وأثبتَّ جدارتك؛ كلماتك تتصاعد بثبات، ومعرفتك تتسع يوماً بعد يوم. إلى الأمام!" },
@@ -108,12 +108,12 @@ let gameState = {
     version: CONFIG.STATE_VERSION
 };
 
-// قواعد البيانات (يتم ملؤها من ملفات الأسئلة)
-window.stagesDatabase = { nahw: [], sarf: [] };
+// قواعد البيانات (حماية من المسح)
+window.stagesDatabase = window.stagesDatabase || { nahw: [], sarf: [] };
 
-// دالة التسجيل للمراحل
-window.registerNahwStage = function(stageData) { window.stagesDatabase.nahw.push(stageData); };
-window.registerSarfStage = function(stageData) { window.stagesDatabase.sarf.push(stageData); };
+// دالة التسجيل للمراحل (حماية إضافية)
+window.registerNahwStage = window.registerNahwStage || function(stageData) { window.stagesDatabase.nahw.push(stageData); };
+window.registerSarfStage = window.registerSarfStage || function(stageData) { window.stagesDatabase.sarf.push(stageData); };
 
 // ==================== تحميل وحفظ الحالة ====================
 function loadSavedState() {
@@ -134,7 +134,7 @@ function saveState() {
     localStorage.setItem(CONFIG.STORAGE_KEY, JSON.stringify(gameState));
 }
 
-// ==================== دوال مساعدة للتقدم والدروع ====================
+// ==================== دوال مساعدة ====================
 function getTrackProgress(track) {
     let completedLevels = 0;
     let completedStages = gameState.tracks[track].completedStages.length;
@@ -142,9 +142,9 @@ function getTrackProgress(track) {
         const p = gameState.tracks[track].stageProgress[stageId];
         if (p && p.completedLevels) completedLevels += p.completedLevels.length;
     }
-    const totalLevels = CONFIG.TRACKS[track].totalStages * 2; // مستويان لكل مرحلة
+    const totalLevels = CONFIG.TRACKS[track].totalStages * 2;
     const totalQuestions = CONFIG.TRACKS[track].totalQuestions;
-    const doneQuestions = completedLevels * 5; // كل مستوى 5 أسئلة
+    const doneQuestions = completedLevels * 5;
     return { completedLevels, totalLevels, doneQuestions, totalQuestions, completedStages };
 }
 
@@ -212,7 +212,7 @@ function startHeartTimerCountdown() {
     tick(); heartTimerInterval = setInterval(tick, 1000);
 }
 
-// ==================== الشاشات الأساسية ====================
+// ==================== الشاشات ====================
 const welcomeScreen = document.getElementById('welcome-screen');
 const dashboardScreen = document.getElementById('dashboard-screen');
 const stagesScreen = document.getElementById('stages-screen');
@@ -449,13 +449,13 @@ function renderTrainingTopics() {
 
 // ==================== منطق الاختبار (المحرك الجديد) ====================
 let currentStageData = null;
-let mainQuestionsPool = [];   // أسئلة المستوى الأساسية
-let reviewQuestionsPool = []; // أسئلة المراجعة (الأخطاء)
+let mainQuestionsPool = [];   
+let reviewQuestionsPool = []; 
 let currentQuestion = null;
 let questionTimerInterval = null;
 let questionTimeLeft = CONFIG.QUESTION_TIME;
 let isProcessingAnswer = false;
-let currentQuestionSource = 'main'; // 'main' أو 'review'
+let currentQuestionSource = 'main'; 
 
 function startStageQuiz(stageId) {
     regenHearts();
@@ -468,7 +468,6 @@ function startStageQuiz(stageId) {
     const trackData = gameState.tracks[track];
     const progress = trackData.stageProgress[stageId] || { completedLevels: [] };
     
-    // إيجاد المستوى الذي لم يكتمل (أو البداية من 1 إذا أعاد اللعب)
     let startLevel = 1;
     for (let i = 1; i <= stage.levels.length; i++) {
         if (!progress.completedLevels.includes(i)) { startLevel = i; break; }
@@ -478,7 +477,7 @@ function startStageQuiz(stageId) {
     currentStageData = stage;
     gameState.currentStageId = stageId;
     gameState.currentLevel = startLevel;
-    reviewQuestionsPool = []; // تفريغ المراجعة عند بداية جديدة
+    reviewQuestionsPool = []; 
     
     loadLevelQuestions();
 
@@ -491,7 +490,6 @@ function startStageQuiz(stageId) {
 
 function loadLevelQuestions() {
     const levelData = currentStageData.levels[gameState.currentLevel - 1];
-    // نسخ الأسئلة إلى قائمة اللعب الأساسية
     mainQuestionsPool = [...levelData.questions];
 }
 
@@ -504,7 +502,6 @@ function loadQuizQuestion() {
         return;
     }
 
-    // تحديد مصدر السؤال
     if (mainQuestionsPool.length > 0) {
         currentQuestionSource = 'main';
         currentQuestion = mainQuestionsPool[Math.floor(Math.random() * mainQuestionsPool.length)];
@@ -520,7 +517,6 @@ function loadQuizQuestion() {
 
     const totalInLevel = currentStageData.levels[gameState.currentLevel - 1].questions.length;
     
-    // تحديث الواجهة
     document.getElementById('quiz-mode-label').textContent = currentQuestionSource === 'review' ? 'مراجعة:' : 'السؤال:';
     document.getElementById('quiz-mode-label').className = currentQuestionSource === 'review' ? 'text-amber-400 font-bold' : 'text-slate-400';
     document.getElementById('current-q-index').textContent = currentQuestionSource === 'review' ? '!' : Math.min(totalInLevel - mainQuestionsPool.length + 1, totalInLevel);
@@ -593,7 +589,6 @@ function handleTimeOut() {
     gameState.streak = 0;
     loseHeart();
 
-    // نقل السؤال إلى قائمة المراجعة إذا لم يكن موجوداً
     if (currentQuestionSource === 'main') {
         const idx = mainQuestionsPool.indexOf(qData);
         if (idx > -1) mainQuestionsPool.splice(idx, 1);
@@ -626,13 +621,11 @@ function submitAnswer(selectedIndex, selectedButton) {
         selectedButton.classList.remove('bg-slate-800/80', 'border-slate-700');
         selectedButton.classList.add('bg-emerald-600/90', 'border-emerald-400');
 
-        // نقاط ومكافآت
-        if (currentQuestionSource === 'main') { // النقاط فقط للإجابة الصحيحة من أول مرة
+        if (currentQuestionSource === 'main') {
             gameState.score += CONFIG.POINTS_PER_CORRECT;
             const idx = mainQuestionsPool.indexOf(qData);
             if (idx > -1) mainQuestionsPool.splice(idx, 1);
         } else {
-            // إجابة صحيحة في المراجعة (بدون نقاط، فقط إزالة من القائمة)
             const idx = reviewQuestionsPool.indexOf(qData);
             if (idx > -1) reviewQuestionsPool.splice(idx, 1);
         }
@@ -658,15 +651,11 @@ function submitAnswer(selectedIndex, selectedButton) {
         gameState.streak = 0;
         loseHeart();
 
-        // نقل السؤال إلى قائمة المراجعة
         if (currentQuestionSource === 'main') {
             const idx = mainQuestionsPool.indexOf(qData);
             if (idx > -1) mainQuestionsPool.splice(idx, 1);
             if (!reviewQuestionsPool.includes(qData)) reviewQuestionsPool.push(qData);
-        } else {
-            // إذا أخطأ في المراجعة، يبقى في قائمة المراجعة
-            // (يمكن إضافته للنهاية لإعادة ترتيب عشوائي، لكن تركه كافي)
-        }
+        } 
 
         box.className = "p-5 rounded-2xl border bg-rose-950/60 border-rose-500/40 space-y-3 animate-fade-in";
         document.getElementById('feedback-header').innerHTML = `<i class="fa-solid fa-circle-xmark text-rose-400"></i> <span class="text-rose-300">إجابة خاطئة — سيُعاد عليك في المراجعة</span>`;
@@ -688,7 +677,6 @@ function nextQuestion() {
 }
 
 function handleLevelComplete() {
-    // حفظ أن المستوى اكتمل
     const track = gameState.currentTrack;
     const stageId = gameState.currentStageId;
     if (!gameState.tracks[track].stageProgress[stageId]) {
@@ -719,7 +707,7 @@ function handleLevelComplete() {
     
     setTimeout(() => {
         gameState.currentLevel = nextLevel;
-        reviewQuestionsPool = []; // تصفير مراجعة المستوى السابق
+        reviewQuestionsPool = []; 
         loadLevelQuestions();
         currentQuestion = null;
         loadQuizQuestion();
@@ -734,8 +722,7 @@ function finishStage() {
 
     const track = gameState.currentTrack;
     const totalLevels = currentStageData.levels.length;
-    const completedLevels = gameState.tracks[track].stageProgress[currentStageData.id].completedLevels.length;
-
+    
     document.getElementById('result-stage-title').textContent = currentStageData.title;
     document.getElementById('result-correct-count').textContent = totalLevels * 5;
     document.getElementById('result-total-count').textContent = totalLevels * 5;
@@ -756,14 +743,12 @@ function finishStage() {
         if (exists) gameState.tracks[track].unlockedStages.push(nextId);
     }
 
-    // قفل الاسم بعد إتمام المرحلة 1 في مسار النحو
     if (track === 'nahw' && currentStageData.id === 1 && !gameState.nameLocked) {
         gameState.nameLocked = true;
         if (!gameState.uuid) gameState.uuid = generateUUID();
         showToast("🔒 تم قفل اسمك نهائيًا مع توليد كود الشهادة");
     }
 
-    // فحص إن كان قد أكمل كل شيء
     if (getTotalCompletedStages() >= 20) {
         setTimeout(() => { showToast("🎉 مبروك! أكملت جميع المراحل — يمكنك استخراج شهادتك الآن!"); }, 2500);
     }
