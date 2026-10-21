@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>النحو الميسّر - المنصة التعليمية الجامعية</title>
+    <title>لنتعلم قواعد النحو والصرف - المنصة التعليمية التفاعلية</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -21,18 +21,18 @@
                     </div>
                     <div class="min-w-0">
                         <h1 class="text-base font-black tracking-wide text-transparent bg-clip-text bg-gradient-to-r from-emerald-300 to-teal-200 truncate">
-                            النحو الميسّر
+                            لنتعلم قواعد النحو والصرف
                         </h1>
                         <p class="text-[10px] text-slate-400 truncate">المنصة الأكاديمية التفاعلية</p>
                     </div>
                 </div>
 
                 <div id="nav-buttons" class="hidden flex items-center gap-2 shrink-0">
-                    <button onclick="goToDashboard()" title="خريطة المراحل" class="p-2 rounded-xl bg-slate-800 hover:bg-emerald-700 text-emerald-300 transition border border-emerald-500/30">
-                        <i class="fa-solid fa-map-location-dot text-sm"></i>
-                    </button>
-                    <button onclick="goToWelcome()" title="الرئيسية" class="p-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 transition border border-slate-700">
+                    <button onclick="goToDashboard()" title="الرئيسية" class="p-2 rounded-xl bg-slate-800 hover:bg-emerald-700 text-emerald-300 transition border border-emerald-500/30">
                         <i class="fa-solid fa-house text-sm"></i>
+                    </button>
+                    <button onclick="goToWelcome()" title="صفحة الترحيب" class="p-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 transition border border-slate-700">
+                        <i class="fa-solid fa-arrow-right-from-bracket text-sm"></i>
                     </button>
                 </div>
             </div>
@@ -67,14 +67,14 @@
             </div>
             
             <div class="space-y-2">
-                <h2 class="text-3xl md:text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-emerald-300 via-teal-200 to-cyan-300">النحو الميسّر</h2>
-                <p class="text-slate-300 text-sm md:text-base max-w-md mx-auto leading-relaxed">بيئة تعليمية جامعية تفاعلية لدراسة قواعد النحو العربي بأسلوب سلس ومحفز.</p>
+                <h2 class="text-3xl md:text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-emerald-300 via-teal-200 to-cyan-300">لنتعلم قواعد النحو والصرف</h2>
+                <p class="text-slate-300 text-sm md:text-base max-w-md mx-auto leading-relaxed">رحلتك التفاعلية لدراسة قواعد النحو العربي وعلم الصرف في مسارين متكاملين.</p>
             </div>
 
             <div class="space-y-4 pt-2">
                 <div class="relative">
                     <span class="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400"><i class="fa-solid fa-user-pen"></i></span>
-                    <input type="text" id="student-name-input" placeholder="أدخل اسمك الكريم للطالب الجامعي..."
+                    <input type="text" id="student-name-input" placeholder="أدخل اسمك الكريم..."
                         class="w-full pr-12 pl-12 py-3.5 bg-slate-800/90 border border-slate-700 rounded-2xl focus:outline-none focus:border-emerald-500 text-white placeholder-slate-400 text-right text-base transition shadow-inner">
                     <span id="name-lock-icon" class="hidden absolute left-4 top-1/2 -translate-y-1/2 text-amber-400" title="الاسم مقفل">
                         <i class="fa-solid fa-lock"></i>
@@ -94,7 +94,7 @@
             </div>
         </section>
 
-        <!-- 2. DASHBOARD -->
+        <!-- 2. DASHBOARD (اختيار المسار) -->
         <section id="dashboard-screen" class="hidden w-full space-y-6 animate-fade-in">
 
             <!-- شريط التقدم العام -->
@@ -110,20 +110,24 @@
                         </div>
                     </div>
                     <div class="text-left">
-                        <p class="text-xs text-slate-400">المستويات المنجزة</p>
-                        <p id="progress-total-levels" class="text-sm font-bold text-emerald-300">0 / 270</p>
+                        <p class="text-xs text-slate-400">الإجمالي</p>
+                        <p id="progress-total-questions" class="text-sm font-bold text-emerald-300" dir="ltr">0 / 200</p>
                     </div>
                 </div>
                 <div class="relative w-full h-3 bg-slate-800 rounded-full overflow-hidden border border-slate-700">
                     <div id="progress-fill" class="bg-gradient-to-r from-amber-400 via-emerald-500 to-cyan-400 h-full w-0 transition-all duration-700"></div>
                 </div>
-                <p class="text-center text-xs text-slate-400 mt-2">نسبة الإنجاز الكلية: <span id="progress-percent" class="font-bold text-amber-300">0%</span></p>
+                <div class="flex justify-between items-center mt-2 text-xs">
+                    <span class="text-emerald-300" dir="ltr">النحو: <span id="progress-nahw" class="font-bold">0/100</span></span>
+                    <span class="text-center text-slate-400">نسبة الإنجاز: <span id="progress-percent" class="font-bold text-amber-300">0%</span></span>
+                    <span class="text-cyan-300" dir="ltr">الصرف: <span id="progress-sarf" class="font-bold">0/100</span></span>
+                </div>
             </div>
 
             <div class="bg-gradient-to-r from-emerald-900/40 via-teal-900/30 to-slate-900/50 p-6 rounded-3xl border border-emerald-500/30 flex flex-col md:flex-row justify-between items-center gap-4">
                 <div class="space-y-1 text-center md:text-right">
                     <h3 id="welcome-banner-title" class="text-xl md:text-2xl font-black text-emerald-200">أهلاً بك يا طالب العلم</h3>
-                    <p class="text-slate-300 text-sm">اختر إحدى المراحل النحوية أدناه أو اطلع على دليل القاعدة الخاص بكل قسم.</p>
+                    <p class="text-slate-300 text-sm">اختر المسار الذي تريد دراسته، وابدأ رحلتك من المرحلة الأولى.</p>
                 </div>
                 <div class="flex flex-col sm:flex-row gap-3">
                     <button onclick="openCertificate()" 
@@ -134,35 +138,58 @@
                     <button onclick="openTrainingArena()" 
                         class="px-5 py-3 bg-gradient-to-r from-teal-600 to-cyan-700 hover:from-teal-500 hover:to-cyan-600 text-white font-bold rounded-2xl shadow-lg shadow-teal-600/20 transition flex items-center gap-2 border border-teal-400/30">
                         <i class="fa-solid fa-book-bookmark text-amber-300 text-lg"></i>
-                        <span>📚 ساحة التدريب الشاملة</span>
+                        <span>📚 ساحة التدريب</span>
                     </button>
                 </div>
             </div>
 
-            <div class="grid grid-cols-1 lg:grid-cols-4 gap-6">
-                <div class="lg:col-span-3 space-y-4">
-                    <div class="flex items-center justify-between">
-                        <h4 class="text-lg font-bold text-slate-200 flex items-center gap-2">
-                            <i class="fa-solid fa-map-location-dot text-emerald-400"></i> خريطة المراحل النحوية
-                        </h4>
-                        <span id="stages-count-badge" class="text-xs text-slate-400 bg-slate-800/80 px-3 py-1 rounded-full border border-slate-700">26 مراحل</span>
-                    </div>
-                    <div id="stages-grid" class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4"></div>
-                </div>
-
-                <div class="lg:col-span-1 space-y-4">
-                    <div class="bg-slate-900/80 backdrop-blur-md rounded-3xl p-5 border border-teal-500/30 shadow-xl space-y-4 sticky top-24">
-                        <div class="flex items-center gap-2.5 text-teal-300 border-b border-slate-800 pb-3">
-                            <i class="fa-solid fa-circle-info text-emerald-400"></i>
-                            <h5 class="font-bold text-sm">إرشادات سريعة</h5>
+            <!-- بطاقتا المسارين -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <button onclick="openTrack('nahw')" class="group bg-slate-900/80 backdrop-blur-md rounded-3xl p-8 border border-emerald-500/30 shadow-xl hover:border-emerald-400/60 hover:-translate-y-1 transition-all text-right relative overflow-hidden">
+                    <div class="absolute -top-12 -left-12 w-40 h-40 bg-gradient-to-br from-emerald-600 to-teal-700 opacity-20 rounded-full blur-2xl group-hover:opacity-30 transition"></div>
+                    <div class="relative z-10 space-y-4">
+                        <div class="w-16 h-16 rounded-2xl bg-gradient-to-br from-emerald-600 to-teal-700 flex items-center justify-center text-white shadow-lg">
+                            <i class="fa-solid fa-book-open text-3xl"></i>
                         </div>
-                        <ul class="space-y-3 text-xs text-slate-300 leading-relaxed">
-                            <li class="flex items-start gap-2"><i class="fa-solid fa-check text-emerald-400 mt-0.5"></i><span>كل إجابة صحيحة ترافقها <strong>تعزيزات صوتية عربية حماسية</strong>.</span></li>
-                            <li class="flex items-start gap-2"><i class="fa-solid fa-book text-teal-400 mt-0.5"></i><span>استخدم زر <strong>📖 دليل القاعدة</strong> تحت كل قسم لمراجعته فوراً.</span></li>
-                            <li class="flex items-start gap-2"><i class="fa-solid fa-heart text-rose-500 mt-0.5"></i><span>تحصل على قلب إضافي عند إتمام 5 إجابات صحيحة متتالية.</span></li>
-                        </ul>
+                        <div>
+                            <h4 class="text-2xl font-black text-emerald-200">مسار النحو</h4>
+                            <p class="text-sm text-slate-300 mt-1 leading-relaxed">عشر مراحل شاملة في قواعد النحو العربي، من أقسام الكلمة إلى التراكيب المتقدمة.</p>
+                        </div>
+                        <div class="flex items-center gap-2 text-xs text-slate-400">
+                            <i class="fa-solid fa-list-check text-emerald-400"></i>
+                            <span>10 مراحل • 100 سؤال</span>
+                        </div>
+                        <div class="pt-2">
+                            <span class="inline-flex items-center gap-2 text-emerald-300 font-bold text-sm group-hover:gap-3 transition-all">
+                                <span>ابدأ النحو</span>
+                                <i class="fa-solid fa-arrow-left"></i>
+                            </span>
+                        </div>
                     </div>
-                </div>
+                </button>
+
+                <button onclick="openTrack('sarf')" class="group bg-slate-900/80 backdrop-blur-md rounded-3xl p-8 border border-cyan-500/30 shadow-xl hover:border-cyan-400/60 hover:-translate-y-1 transition-all text-right relative overflow-hidden">
+                    <div class="absolute -top-12 -left-12 w-40 h-40 bg-gradient-to-br from-cyan-600 to-blue-700 opacity-20 rounded-full blur-2xl group-hover:opacity-30 transition"></div>
+                    <div class="relative z-10 space-y-4">
+                        <div class="w-16 h-16 rounded-2xl bg-gradient-to-br from-cyan-600 to-blue-700 flex items-center justify-center text-white shadow-lg">
+                            <i class="fa-solid fa-language text-3xl"></i>
+                        </div>
+                        <div>
+                            <h4 class="text-2xl font-black text-cyan-200">مسار الصرف</h4>
+                            <p class="text-sm text-slate-300 mt-1 leading-relaxed">عشر مراحل متخصصة في علم الصرف، من الفعل الصحيح والمعتل إلى التصغير والنسب.</p>
+                        </div>
+                        <div class="flex items-center gap-2 text-xs text-slate-400">
+                            <i class="fa-solid fa-list-check text-cyan-400"></i>
+                            <span>10 مراحل • 100 سؤال</span>
+                        </div>
+                        <div class="pt-2">
+                            <span class="inline-flex items-center gap-2 text-cyan-300 font-bold text-sm group-hover:gap-3 transition-all">
+                                <span>ابدأ الصرف</span>
+                                <i class="fa-solid fa-arrow-left"></i>
+                            </span>
+                        </div>
+                    </div>
+                </button>
             </div>
 
             <!-- زر التصفير -->
@@ -176,7 +203,33 @@
 
         </section>
 
-        <!-- 3. TRAINING -->
+        <!-- 3. STAGES SCREEN (خريطة مراحل المسار) -->
+        <section id="stages-screen" class="hidden w-full space-y-6 animate-fade-in">
+            <div class="flex items-center justify-between bg-slate-900/80 p-5 rounded-2xl border border-emerald-500/30">
+                <div class="flex items-center gap-3">
+                    <div id="stages-track-icon" class="p-3 bg-emerald-500/20 rounded-xl text-emerald-300 border border-emerald-500/30">
+                        <i class="fa-solid fa-book-open text-2xl"></i>
+                    </div>
+                    <div>
+                        <h3 id="stages-track-title" class="text-xl font-bold text-emerald-200">خريطة النحو</h3>
+                        <p id="stages-track-desc" class="text-xs text-slate-400">اختر مرحلة لبدء التحدي أو مراجعة دليل القاعدة</p>
+                    </div>
+                </div>
+                <button onclick="goToDashboard()" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 font-semibold rounded-xl border border-slate-700 transition flex items-center gap-2">
+                    <i class="fa-solid fa-arrow-right"></i> الرئيسية
+                </button>
+            </div>
+
+            <div class="flex items-center justify-between">
+                <h4 class="text-lg font-bold text-slate-200 flex items-center gap-2">
+                    <i class="fa-solid fa-map-location-dot text-emerald-400"></i> <span id="stages-track-label">المراحل النحوية</span>
+                </h4>
+                <span id="stages-count-badge" class="text-xs text-slate-400 bg-slate-800/80 px-3 py-1 rounded-full border border-slate-700">10 مراحل</span>
+            </div>
+            <div id="stages-grid" class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4"></div>
+        </section>
+
+        <!-- 4. TRAINING -->
         <section id="training-screen" class="hidden w-full space-y-6 animate-fade-in">
             <div class="flex items-center justify-between bg-slate-900/80 p-5 rounded-2xl border border-teal-500/30">
                 <div class="flex items-center gap-3">
@@ -185,24 +238,24 @@
                     </div>
                     <div>
                         <h3 class="text-xl font-bold text-teal-200">ساحة التدريب وشرح القواعد</h3>
-                        <p class="text-xs text-slate-400">مرجعك الشامل لضبط القواعد النحوية قبل بدء الاختبارات</p>
+                        <p class="text-xs text-slate-400">مرجعك الشامل لضبط القواعد قبل بدء الاختبارات</p>
                     </div>
                 </div>
                 <button onclick="goToDashboard()" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 font-semibold rounded-xl border border-slate-700 transition flex items-center gap-2">
-                    <i class="fa-solid fa-arrow-right"></i> العودة للخريطة
+                    <i class="fa-solid fa-arrow-right"></i> العودة
                 </button>
             </div>
-            <div id="training-topics-container" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
+            <div id="training-topics-container" class="space-y-6"></div>
         </section>
 
-        <!-- 4. QUIZ -->
+        <!-- 5. QUIZ -->
         <section id="quiz-screen" class="hidden w-full max-w-2xl mx-auto space-y-6 animate-fade-in">
             <div class="flex justify-between items-center bg-slate-900/80 p-4 rounded-2xl border border-slate-800 text-sm">
-                <button onclick="goToDashboard()" class="text-slate-400 hover:text-white transition flex items-center gap-1.5 text-xs bg-slate-800 px-3 py-1.5 rounded-lg border border-slate-700">
-                    <i class="fa-solid fa-xmark"></i> إنهاء المرحلة
+                <button onclick="confirmQuitQuiz()" class="text-slate-400 hover:text-white transition flex items-center gap-1.5 text-xs bg-slate-800 px-3 py-1.5 rounded-lg border border-slate-700">
+                    <i class="fa-solid fa-xmark"></i> إنهاء
                 </button>
                 <div class="flex items-center gap-2">
-                    <span class="text-slate-400">السؤال:</span>
+                    <span id="quiz-mode-label" class="text-slate-400">السؤال:</span>
                     <span id="current-q-index" class="bg-emerald-500/20 text-emerald-300 px-2.5 py-0.5 rounded-lg font-bold">1</span>
                     <span class="text-slate-500">/ <span id="total-q-index">5</span></span>
                 </div>
@@ -240,7 +293,7 @@
                 <p id="feedback-explanation" class="text-sm text-slate-300 leading-relaxed whitespace-pre-line"></p>
                 <div id="feedback-training-tip" class="text-xs text-teal-300 bg-teal-950/50 p-2.5 rounded-xl border border-teal-500/20 flex items-center gap-2">
                     <i class="fa-solid fa-lightbulb text-amber-400"></i>
-                    <span>نصيحة: راجع القاعدة في دليل القسم ثم حاول مرة أخرى.</span>
+                    <span>سؤال المراجعة — سيبقى في القائمة حتى تُجيب عنه إجابة صحيحة.</span>
                 </div>
                 <button onclick="nextQuestion()" class="w-full py-3 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-bold rounded-xl shadow-lg transition flex items-center justify-center gap-2">
                     <span>السؤال التالي</span> <i class="fa-solid fa-arrow-left"></i>
@@ -248,17 +301,17 @@
             </div>
         </section>
 
-        <!-- 5. RESULT -->
+        <!-- 6. RESULT -->
         <section id="result-screen" class="hidden w-full max-w-md mx-auto bg-slate-900/80 backdrop-blur-xl border border-emerald-500/30 rounded-3xl p-8 shadow-2xl space-y-6 text-center animate-fade-in">
             <div id="result-trophy-wrapper" class="inline-flex p-5 rounded-full bg-gradient-to-br from-amber-500/20 to-emerald-500/20 border border-amber-500/30 shadow-lg">
                 <i id="result-trophy-icon" class="fa-solid fa-trophy text-5xl text-amber-400"></i>
             </div>
             <div class="space-y-2">
                 <h3 id="result-title-text" class="text-2xl md:text-3xl font-black text-white">أتممت المرحلة بنجاح!</h3>
-                <p id="result-stage-title" class="text-emerald-300 font-semibold text-sm">أقسام الكلام</p>
+                <p id="result-stage-title" class="text-emerald-300 font-semibold text-sm">المرحلة</p>
             </div>
             <div class="bg-slate-800/80 p-5 rounded-2xl border border-slate-700 space-y-2">
-                <p class="text-slate-400 text-xs">نتيجتك في هذه المرحلة</p>
+                <p class="text-slate-400 text-xs">الأسئلة الصحيحة</p>
                 <p class="text-3xl font-black text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-teal-300">
                     <span id="result-correct-count">0</span> / <span id="result-total-count">10</span>
                 </p>
@@ -266,22 +319,22 @@
             </div>
             <div class="flex gap-3 pt-2">
                 <button onclick="restartCurrentStage()" class="flex-1 py-3 bg-slate-800 hover:bg-slate-700 text-white font-bold rounded-xl border border-slate-700 transition flex items-center justify-center gap-2 text-sm">
-                    <i class="fa-solid fa-rotate-right"></i> إعادة المرحلة
+                    <i class="fa-solid fa-rotate-right"></i> إعادة
                 </button>
-                <button onclick="goToDashboard()" class="flex-1 py-3 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-bold rounded-xl shadow-lg transition flex items-center justify-center gap-2 text-sm">
-                    <i class="fa-solid fa-map"></i> خريطة المراحل
+                <button onclick="goToCurrentTrackMap()" class="flex-1 py-3 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-bold rounded-xl shadow-lg transition flex items-center justify-center gap-2 text-sm">
+                    <i class="fa-solid fa-map"></i> خريطة المسار
                 </button>
             </div>
         </section>
 
-        <!-- 6. OUT OF HEARTS -->
+        <!-- 7. OUT OF HEARTS -->
         <section id="out-of-hearts-screen" class="hidden w-full max-w-md mx-auto bg-slate-900/90 backdrop-blur-xl border border-rose-500/30 rounded-3xl p-8 shadow-2xl space-y-6 text-center animate-fade-in">
             <div class="inline-flex p-5 rounded-full bg-rose-500/20 border border-rose-500/30 shadow-lg">
                 <i class="fa-solid fa-heart-crack text-5xl text-rose-500 pulse-heart"></i>
             </div>
             <div class="space-y-2">
                 <h3 class="text-2xl font-black text-white">نفدت قلوبك!</h3>
-                <p class="text-slate-300 text-sm">لقد نفدت محاولاتك الحالية. تستطيع انتظار استعادة القلوب تدريجيًا أو مراجعة دليل القواعد.</p>
+                <p class="text-slate-300 text-sm">انتظر استعادة القلوب تدريجيًا أو راجع دليل القواعد.</p>
             </div>
             <div class="bg-slate-800/80 p-4 rounded-2xl border border-slate-700 space-y-2">
                 <p class="text-slate-400 text-xs">وقت استعادة القلوب القادم:</p>
@@ -319,7 +372,7 @@
             <div class="flex gap-3 pt-2">
                 <button onclick="closeStageRuleModal()" class="flex-1 py-3 bg-slate-800 hover:bg-slate-700 text-slate-300 font-semibold rounded-xl border border-slate-700 transition text-sm">إغلاق الدليل</button>
                 <button id="modal-start-quiz-btn" class="flex-1 py-3 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-bold rounded-xl shadow-lg transition text-sm flex items-center justify-center gap-2">
-                    <i class="fa-solid fa-play"></i> بدء تحدي القسم
+                    <i class="fa-solid fa-play"></i> بدء التحدي
                 </button>
             </div>
         </div>
@@ -328,11 +381,9 @@
     <!-- RULES MODAL -->
     <div id="rules-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-sm animate-fade-in">
         <div class="bg-slate-900 border border-teal-500/40 rounded-3xl max-w-lg w-full p-6 md:p-8 space-y-5 shadow-2xl relative max-h-[90vh] overflow-y-auto">
-            
             <button onclick="closeRulesModal()" class="absolute top-5 left-5 text-slate-400 hover:text-white transition p-2 bg-slate-800 rounded-xl">
                 <i class="fa-solid fa-xmark text-lg"></i>
             </button>
-
             <div class="flex items-center gap-3 pb-3 border-b border-slate-800">
                 <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-emerald-500 to-teal-700 flex items-center justify-center text-white shadow-lg">
                     <i class="fa-solid fa-circle-question text-xl"></i>
@@ -342,7 +393,6 @@
                     <p class="text-xs text-slate-400">تعرّف على طريقة اللعب والمكافآت</p>
                 </div>
             </div>
-
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs text-slate-300">
                 <div class="flex items-start gap-2 bg-slate-800/50 p-2.5 rounded-lg border border-slate-700/50">
                     <i class="fa-solid fa-heart text-rose-400 mt-0.5"></i>
@@ -362,7 +412,7 @@
                 </div>
                 <div class="flex items-start gap-2 bg-slate-800/50 p-2.5 rounded-lg border border-slate-700/50">
                     <i class="fa-solid fa-star text-amber-400 mt-0.5"></i>
-                    <span><strong class="text-amber-300">10 نقاط</strong> لكل إجابة صحيحة</span>
+                    <span><strong class="text-amber-300">10 نقاط</strong> لكل إجابة صحيحة (المرة الأولى)</span>
                 </div>
                 <div class="flex items-start gap-2 bg-slate-800/50 p-2.5 rounded-lg border border-slate-700/50">
                     <i class="fa-solid fa-hourglass-half text-orange-400 mt-0.5"></i>
@@ -377,28 +427,30 @@
                     <span>راجع القواعد في <strong class="text-teal-300">ساحة التدريب</strong></span>
                 </div>
                 <div class="flex items-start gap-2 bg-slate-800/50 p-2.5 rounded-lg border border-slate-700/50 sm:col-span-2">
+                    <i class="fa-solid fa-rotate text-cyan-400 mt-0.5"></i>
+                    <span>عند الخطأ: يظهر الجواب الصحيح، وينتقل السؤال إلى <strong class="text-cyan-300">مراجعة نهاية المرحلة</strong></span>
+                </div>
+                <div class="flex items-start gap-2 bg-slate-800/50 p-2.5 rounded-lg border border-slate-700/50 sm:col-span-2">
                     <i class="fa-solid fa-volume-high text-purple-400 mt-0.5"></i>
                     <span>تعزيزات صوتية عربية عند كل <strong class="text-purple-300">إجابة صحيحة</strong></span>
                 </div>
                 <div class="flex items-start gap-2 bg-slate-800/50 p-2.5 rounded-lg border border-slate-700/50 sm:col-span-2">
                     <i class="fa-solid fa-database text-cyan-400 mt-0.5"></i>
-                    <span>تحتوي المنصة على <strong class="text-cyan-300">1350 سؤالًا</strong> في 26 مرحلة نحوية</span>
+                    <span>تحتوي المنصة على <strong class="text-cyan-300">200 سؤال</strong> موزعة على <strong class="text-cyan-300">20 مرحلة</strong> (نحو + صرف)</span>
                 </div>
                 <div class="flex items-start gap-2 bg-slate-800/50 p-2.5 rounded-lg border border-slate-700/50 sm:col-span-2">
                     <i class="fa-solid fa-lock text-amber-400 mt-0.5"></i>
-                    <span>يُقفل اسمك نهائيًا بعد إتمام <strong class="text-amber-300">المرحلة الأولى</strong></span>
+                    <span>يُقفل اسمك نهائيًا بعد إتمام <strong class="text-amber-300">أول مرحلة نحوية</strong></span>
                 </div>
                 <div class="flex items-start gap-2 bg-slate-800/50 p-2.5 rounded-lg border border-slate-700/50 sm:col-span-2">
                     <i class="fa-solid fa-award text-yellow-400 mt-0.5"></i>
-                    <span>استخرج <strong class="text-yellow-300">شهادة الإنجاز</strong> بعد إتمام جميع المراحل</span>
+                    <span>استخرج <strong class="text-yellow-300">شهادة الإنجاز</strong> من الصفحة الرئيسية</span>
                 </div>
             </div>
-
             <p class="text-[11px] text-slate-500 text-center pt-2 border-t border-slate-800">
                 <i class="fa-solid fa-circle-info text-emerald-500"></i>
                 المنصة تحفظ تقدمك تلقائياً في متصفحك.
             </p>
-
             <button onclick="closeRulesModal()" class="w-full py-3 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-bold rounded-xl shadow-lg transition text-sm">
                 فهمت، لنبدأ! 🚀
             </button>
@@ -417,35 +469,30 @@
                     <p class="text-xs text-slate-400">هذا الإجراء لا يمكن التراجع عنه</p>
                 </div>
             </div>
-
             <div class="bg-rose-950/40 border border-rose-500/30 rounded-2xl p-4 text-xs text-rose-200 space-y-2">
                 <p><i class="fa-solid fa-exclamation-circle"></i> <strong>تحذير:</strong> سيُمسح كل شيء:</p>
                 <ul class="space-y-1 pr-4 list-disc">
                     <li>اسم الطالب وحالة القفل</li>
                     <li>النقاط والقلوب</li>
-                    <li>كل تقدمك في المراحل</li>
+                    <li>كل تقدمك في مساري النحو والصرف</li>
                     <li>كود الشهادة</li>
                 </ul>
             </div>
-
             <div class="space-y-3">
-    <div class="bg-slate-800/60 border border-amber-500/40 rounded-2xl p-3 text-center">
-        <p class="text-[10px] text-slate-400 mb-1">كود التصفير:</p>
-        <p class="font-bold text-amber-300 text-xl tracking-wider" dir="rtl">فيلادلفيا</p>
-    </div>
-    <label class="text-xs text-slate-300 font-semibold block">اكتب الكود في الحقل للتأكيد:</label>
-    <input type="text" id="reset-code-input" placeholder="اكتب الكود هنا..."
-        class="w-full px-4 py-3 bg-slate-800/90 border border-slate-700 rounded-2xl focus:outline-none focus:border-rose-500 text-white placeholder-slate-500 text-center text-base transition"
-        dir="rtl">
-    <p id="reset-error" class="hidden text-xs text-rose-400 text-center">
-        <i class="fa-solid fa-circle-xmark"></i> كود خاطئ، حاول مرة أخرى
-    </p>
-</div>
-
+                <div class="bg-slate-800/60 border border-amber-500/40 rounded-2xl p-3 text-center">
+                    <p class="text-[10px] text-slate-400 mb-1">كود التصفير:</p>
+                    <p class="font-bold text-amber-300 text-xl tracking-wider" dir="rtl">فيلادلفيا</p>
+                </div>
+                <label class="text-xs text-slate-300 font-semibold block">اكتب الكود في الحقل للتأكيد:</label>
+                <input type="text" id="reset-code-input" placeholder="اكتب الكود هنا..."
+                    class="w-full px-4 py-3 bg-slate-800/90 border border-slate-700 rounded-2xl focus:outline-none focus:border-rose-500 text-white placeholder-slate-500 text-center text-base transition"
+                    dir="rtl">
+                <p id="reset-error" class="hidden text-xs text-rose-400 text-center">
+                    <i class="fa-solid fa-circle-xmark"></i> كود خاطئ، حاول مرة أخرى
+                </p>
+            </div>
             <div class="flex gap-3 pt-2">
-                <button onclick="closeResetModal()" class="flex-1 py-3 bg-slate-800 hover:bg-slate-700 text-slate-300 font-semibold rounded-xl border border-slate-700 transition text-sm">
-                    إلغاء
-                </button>
+                <button onclick="closeResetModal()" class="flex-1 py-3 bg-slate-800 hover:bg-slate-700 text-slate-300 font-semibold rounded-xl border border-slate-700 transition text-sm">إلغاء</button>
                 <button onclick="confirmReset()" class="flex-1 py-3 bg-gradient-to-r from-rose-600 to-red-700 hover:from-rose-500 hover:to-red-600 text-white font-bold rounded-xl shadow-lg transition text-sm flex items-center justify-center gap-2">
                     <i class="fa-solid fa-trash"></i> تأكيد التصفير
                 </button>
@@ -454,39 +501,18 @@
     </div>
 
     <footer class="w-full bg-slate-900/60 border-t border-slate-800 py-3 text-center text-xs text-slate-500">
-        النحو الميسّر &copy; 2026 - منصة التعلم الأكاديمي التفاعلي، د.عمر الرواجفة
+        لنتعلم قواعد النحو والصرف &copy; 2026 — إشراف د. عمر الرواجفة
     </footer>
 
-    <!-- ========== ملفات بنك الأسئلة ========== -->
-    <script src="questions/index.js"></script>
-    <script src="questions/01-parts-of-speech.js"></script>
-    <script src="questions/02-verb-types.js"></script>
-    <script src="questions/03-noun-types.js"></script>
-    <script src="questions/04-original-case-endings.js"></script>
-    <script src="questions/05-secondary-case-endings.js"></script>
-    <script src="questions/06-nominal-sentence.js"></script>
-    <script src="questions/07-verbal-sentence.js"></script>
-    <script src="questions/08-mubtada-khabar.js"></script>
-    <script src="questions/09-fail.js"></script>
-    <script src="questions/10-naib-fail.js"></script>
-    <script src="questions/11-maful-bihi.js"></script>
-    <script src="questions/12-objects.js"></script>
-    <script src="questions/13-hal.js"></script>
-    <script src="questions/14-tamyiz.js"></script>
-    <script src="questions/15-nat.js"></script>
-    <script src="questions/16-atf.js"></script>
-    <script src="questions/17-tawkid.js"></script>
-    <script src="questions/18-badal.js"></script>
-    <script src="questions/19-kana-sisters.js"></script>
-    <script src="questions/20-inna-sisters.js"></script>
-    <script src="questions/21-la-nafiya-lil-jins.js"></script>
-    <script src="questions/22-five-verbs.js"></script>
-    <script src="questions/23-diptotes.js"></script>
-    <script src="questions/24-genitive-constructions.js"></script>
-    <script src="questions/25-idafa.js"></script>
-    <script src="questions/26-comprehensive-review.js"></script>
+    <!-- ========== بنك أسئلة النحو ========== -->
+    <script src="questions/nahw/index.js"></script>
+    <script src="questions/nahw/01-kalima-irab.js"></script>
+
+    <!-- ========== بنك أسئلة الصرف ========== -->
+    <script src="questions/sarf/index.js"></script>
+    <script src="questions/sarf/01-madkhal-sarf.js"></script>
 
     <!-- ========== منطق التطبيق ========== -->
     <script src="app.js"></script>
 </body>
-                        </html>
+    </html>
