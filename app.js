@@ -1,9 +1,8 @@
 /* ============================================================
-   لنتعلم قواعد النحو والصرف — المنطق الرئيسي (v3.0)
-   نظام المسارين (نحو / صرف) + مراجعة الأخطاء + الدروع
+   لنتعلم قواعد النحو والصرف — المنطق الرئيسي (v3.1)
+   نظام المسارين + مراجعة الأخطاء + حساب التقدم الديناميكي
    ============================================================ */
 
-// ==================== الإعدادات العامة ====================
 const CONFIG = {
     MAX_HEARTS: 20,
     HEART_REGEN_MS: 10 * 60 * 1000,
@@ -12,15 +11,10 @@ const CONFIG = {
     POINTS_PER_CORRECT: 10,
     STREAK_FOR_BONUS_HEART: 5,
     STORAGE_KEY: 'let_learn_nahw_sarf_state_v3',
-    STATE_VERSION: 3,
-    TRACKS: {
-        nahw: { totalStages: 10, totalQuestions: 100, name: 'النحو' },
-        sarf: { totalStages: 10, totalQuestions: 100, name: 'الصرف' }
-    }
+    STATE_VERSION: 3.1
 };
 const RESET_CODE = "فيلادلفيا";
 
-// ==================== الأصوات ====================
 const SOUNDS = {
     ahsant:       { file: 'sounds/Ahsant.mp3',         text: 'أحسنت' },
     momtaz:       { file: 'sounds/Momtaz.mp3',         text: 'ممتاز' },
@@ -79,14 +73,14 @@ function playErrorSound() {
     } catch (e) { }
 }
 
-// ==================== نظام الدروع ====================
+// ==================== نظام الدروع (ديناميكي) ====================
 const BADGES = [
-    { id: 1, title: "درع البداية المضيئة", rank: "مبتدئ واعد", color: "from-amber-700 to-amber-900", icon: "fa-seedling", range: [1, 4], message: "خطوتك الأولى هي أساس كل نجاح عظيم! لقد أضاءت بدايتك عتمة التردد، فاستمر بهذا العزم المنير." },
-    { id: 2, title: "درع سفير الحروف", rank: "سفير اللسان", color: "from-orange-600 to-amber-800", icon: "fa-feather", range: [5, 8], message: "لقد عبرت البدايات وأثبتَّ جدارتك؛ كلماتك تتصاعد بثبات، ومعرفتك تتسع يوماً بعد يوم. إلى الأمام!" },
-    { id: 3, title: "درع بطل المعرفة", rank: "فارس المعرفة المتمكن", color: "from-slate-400 to-slate-600", icon: "fa-shield-halved", range: [9, 12], message: "تجاوزت منتصف الطريق باقتدار! عزيمتك الصلبة تصنع منك بطلًا حقيقيًا لا يعرف اليأس ولا الاستسلام." },
-    { id: 4, title: "درع الحكيم اللغوي", rank: "حارس القواعد", color: "from-yellow-500 to-amber-700", icon: "fa-crown", range: [13, 16], message: "عقلك الراجح وفكرك الثاقب يؤكدان أنك قُمت ببناء قاعدة صلبة من المهارات. لم يبقَ إلا القليل لتصل للقمة!" },
-    { id: 5, title: "درع فارس الميدان", rank: "عميد الفرسان", color: "from-yellow-400 to-yellow-600", icon: "fa-medal", range: [17, 19], message: "أنت على أعتاب القمة الكبرى! شجاعتك في اجتياز هذه المراحل المعقدة تؤهلك لتكون الأبرز بين زملائك." },
-    { id: 6, title: "درع الأسطورة", rank: "بطل الأبطال الأوحد", color: "from-cyan-400 to-blue-600", icon: "fa-gem", range: [20, 20], message: "المجد لمن صبر واجتهد! لقد أتممت الـ 200 سؤال وتجاوزت التحدي الأكبر بجدارة واستحقاق مطلق. أنت الآن أسطورة!" }
+    { id: 1, title: "درع البداية المضيئة", rank: "مبتدئ واعد", color: "from-amber-700 to-amber-900", icon: "fa-seedling", minPercent: 1, maxPercent: 20, message: "خطوتك الأولى هي أساس كل نجاح عظيم! لقد أضاءت بدايتك عتمة التردد، فاستمر بهذا العزم المنير." },
+    { id: 2, title: "درع سفير الحروف", rank: "سفير اللسان", color: "from-orange-600 to-amber-800", icon: "fa-feather", minPercent: 21, maxPercent: 40, message: "لقد عبرت البدايات وأثبتَّ جدارتك؛ كلماتك تتصاعد بثبات، ومعرفتك تتسع يوماً بعد يوم. إلى الأمام!" },
+    { id: 3, title: "درع بطل المعرفة", rank: "فارس المعرفة المتمكن", color: "from-slate-400 to-slate-600", icon: "fa-shield-halved", minPercent: 41, maxPercent: 60, message: "تجاوزت منتصف الطريق باقتدار! عزيمتك الصلبة تصنع منك بطلًا حقيقيًا لا يعرف اليأس ولا الاستسلام." },
+    { id: 4, title: "درع الحكيم اللغوي", rank: "حارس القواعد", color: "from-yellow-500 to-amber-700", icon: "fa-crown", minPercent: 61, maxPercent: 80, message: "عقلك الراجح وفكرك الثاقب يؤكدان أنك قُمت ببناء قاعدة صلبة من المهارات. لم يبقَ إلا القليل لتصل للقمة!" },
+    { id: 5, title: "درع فارس الميدان", rank: "عميد الفرسان", color: "from-yellow-400 to-yellow-600", icon: "fa-medal", minPercent: 81, maxPercent: 99, message: "أنت على أعتاب القمة الكبرى! شجاعتك في اجتياز هذه المراحل المعقدة تؤهلك لتكون الأبرز بين زملائك." },
+    { id: 6, title: "درع الأسطورة", rank: "بطل الأبطال الأوحد", color: "from-cyan-400 to-blue-600", icon: "fa-gem", minPercent: 100, maxPercent: 100, message: "المجد لمن صبر واجتهد! لقد أتممت جميع الأسئلة وتجاوزت التحدي الأكبر بجدارة واستحقاق مطلق. أنت الآن أسطورة!" }
 ];
 
 // ==================== الحالة (State) ====================
@@ -108,14 +102,10 @@ let gameState = {
     version: CONFIG.STATE_VERSION
 };
 
-// قواعد البيانات (حماية من المسح)
 window.stagesDatabase = window.stagesDatabase || { nahw: [], sarf: [] };
-
-// دالة التسجيل للمراحل (حماية إضافية)
 window.registerNahwStage = window.registerNahwStage || function(stageData) { window.stagesDatabase.nahw.push(stageData); };
 window.registerSarfStage = window.registerSarfStage || function(stageData) { window.stagesDatabase.sarf.push(stageData); };
 
-// ==================== تحميل وحفظ الحالة ====================
 function loadSavedState() {
     const raw = localStorage.getItem(CONFIG.STORAGE_KEY);
     if (raw) {
@@ -131,21 +121,43 @@ function loadSavedState() {
 
 function saveState() {
     gameState.version = CONFIG.STATE_VERSION;
+    // حفظ الإحصائيات الديناميكية لكي تقرأها الشهادة
+    gameState.meta = {
+        totalNahwQuestions: getTrackStats('nahw').totalQ,
+        totalSarfQuestions: getTrackStats('sarf').totalQ,
+        totalNahwStages: window.stagesDatabase.nahw.length,
+        totalSarfStages: window.stagesDatabase.sarf.length,
+        doneNahwQuestions: getTrackStats('nahw').doneQ,
+        doneSarfQuestions: getTrackStats('sarf').doneQ
+    };
     localStorage.setItem(CONFIG.STORAGE_KEY, JSON.stringify(gameState));
 }
 
-// ==================== دوال مساعدة ====================
-function getTrackProgress(track) {
-    let completedLevels = 0;
+// ==================== دوال حساب التقدم الديناميكية ====================
+function getTrackStats(track) {
+    let totalQ = 0;
+    let doneQ = 0;
+    let totalStages = window.stagesDatabase[track] ? window.stagesDatabase[track].length : 0;
     let completedStages = gameState.tracks[track].completedStages.length;
-    for (const stageId in gameState.tracks[track].stageProgress) {
-        const p = gameState.tracks[track].stageProgress[stageId];
-        if (p && p.completedLevels) completedLevels += p.completedLevels.length;
+
+    // حساب إجمالي الأسئلة في هذا المسار
+    if (window.stagesDatabase[track]) {
+        window.stagesDatabase[track].forEach(stage => {
+            stage.levels.forEach(lvl => { totalQ += lvl.questions.length; });
+        });
     }
-    const totalLevels = CONFIG.TRACKS[track].totalStages * 2;
-    const totalQuestions = CONFIG.TRACKS[track].totalQuestions;
-    const doneQuestions = completedLevels * 5;
-    return { completedLevels, totalLevels, doneQuestions, totalQuestions, completedStages };
+
+    // حساب الأسئلة التي تم حلها (التي أتم مستوياتها)
+    for (let stageId in gameState.tracks[track].stageProgress) {
+        let stage = window.stagesDatabase[track] ? window.stagesDatabase[track].find(s => s.id == stageId) : null;
+        if (stage) {
+            gameState.tracks[track].stageProgress[stageId].completedLevels.forEach(lvlNum => {
+                let lvl = stage.levels[lvlNum - 1];
+                if (lvl) doneQ += lvl.questions.length;
+            });
+        }
+    }
+    return { totalQ, doneQ, totalStages, completedStages };
 }
 
 function getTotalCompletedStages() {
@@ -153,12 +165,19 @@ function getTotalCompletedStages() {
 }
 
 function getCurrentBadge() {
-    const totalStages = getTotalCompletedStages();
+    const nahw = getTrackStats('nahw');
+    const sarf = getTrackStats('sarf');
+    const totalStages = nahw.totalStages + sarf.totalStages;
     if (totalStages === 0) return null;
+    
+    const completedStages = getTotalCompletedStages();
+    if (completedStages === 0) return null;
+    
+    const percent = (completedStages / totalStages) * 100;
     for (let i = BADGES.length - 1; i >= 0; i--) {
-        if (totalStages >= BADGES[i].range[0]) return BADGES[i];
+        if (percent >= BADGES[i].minPercent) return BADGES[i];
     }
-    return null;
+    return BADGES[0];
 }
 
 function generateUUID() {
@@ -286,7 +305,7 @@ function openTrack(track) {
     
     const isNahw = track === 'nahw';
     document.getElementById('stages-track-title').textContent = isNahw ? 'خريطة النحو' : 'خريطة الصرف';
-    document.getElementById('stages-track-desc').textContent = isNahw ? 'عشر مراحل في قواعد النحو' : 'عشر مراحل في علم الصرف';
+    document.getElementById('stages-track-desc').textContent = isNahw ? 'مراحل في قواعد النحو' : 'مراحل في علم الصرف';
     document.getElementById('stages-track-label').textContent = isNahw ? 'المراحل النحوية' : 'المراحل الصرفية';
     
     const iconDiv = document.getElementById('stages-track-icon');
@@ -301,17 +320,17 @@ function goToCurrentTrackMap() {
     else goToDashboard();
 }
 
-// ==================== شريط التقدم ====================
+// ==================== شريط التقدم الديناميكي ====================
 function renderProgressBar() {
-    const nahw = getTrackProgress('nahw');
-    const sarf = getTrackProgress('sarf');
-    const totalDone = nahw.doneQuestions + sarf.doneQuestions;
-    const totalQ = CONFIG.TRACKS.nahw.totalQuestions + CONFIG.TRACKS.sarf.totalQuestions;
-    const percent = Math.round((totalDone / totalQ) * 100);
+    const nahw = getTrackStats('nahw');
+    const sarf = getTrackStats('sarf');
+    const totalDone = nahw.doneQ + sarf.doneQ;
+    const totalQ = nahw.totalQ + sarf.totalQ;
+    const percent = totalQ === 0 ? 0 : Math.round((totalDone / totalQ) * 100);
     
     document.getElementById('progress-total-questions').textContent = `${totalDone} / ${totalQ}`;
-    document.getElementById('progress-nahw').textContent = `${nahw.doneQuestions}/100`;
-    document.getElementById('progress-sarf').textContent = `${sarf.doneQuestions}/100`;
+    document.getElementById('progress-nahw').textContent = `${nahw.doneQ}/${nahw.totalQ}`;
+    document.getElementById('progress-sarf').textContent = `${sarf.doneQ}/${sarf.totalQ}`;
     document.getElementById('progress-percent').textContent = `${percent}%`;
     document.getElementById('progress-fill').style.width = `${percent}%`;
     
@@ -343,7 +362,7 @@ function renderStagesGrid() {
         const isUnlocked = trackData.unlockedStages.includes(stage.id) || idx === 0;
         const isCompleted = trackData.completedStages.includes(stage.id);
         const progress = trackData.stageProgress[stage.id] || { completedLevels: [] };
-        const totalLevels = stage.levels ? stage.levels.length : 2;
+        const totalLevels = stage.levels ? stage.levels.length : 0;
         const completedLevels = progress.completedLevels.length;
 
         const card = document.createElement('div');
@@ -418,7 +437,7 @@ function renderTrainingTopics() {
     const container = document.getElementById('training-topics-container');
     container.innerHTML = '';
     ['nahw', 'sarf'].forEach(track => {
-        const trackName = CONFIG.TRACKS[track].name;
+        const trackName = track === 'nahw' ? 'النحو' : 'الصرف';
         const trackTitle = document.createElement('h3');
         trackTitle.className = "text-xl font-bold text-emerald-300 mb-4 border-b border-slate-700 pb-2";
         trackTitle.textContent = `مسار ${trackName}`;
@@ -447,7 +466,7 @@ function renderTrainingTopics() {
     });
 }
 
-// ==================== منطق الاختبار (المحرك الجديد) ====================
+// ==================== منطق الاختبار (المحرك الديناميكي) ====================
 let currentStageData = null;
 let mainQuestionsPool = [];   
 let reviewQuestionsPool = []; 
@@ -515,7 +534,8 @@ function loadQuizQuestion() {
     updateQuestionTimerUI();
     startQuestionTimer();
 
-    const totalInLevel = currentStageData.levels[gameState.currentLevel - 1].questions.length;
+    const levelData = currentStageData.levels[gameState.currentLevel - 1];
+    const totalInLevel = levelData.questions.length;
     
     document.getElementById('quiz-mode-label').textContent = currentQuestionSource === 'review' ? 'مراجعة:' : 'السؤال:';
     document.getElementById('quiz-mode-label').className = currentQuestionSource === 'review' ? 'text-amber-400 font-bold' : 'text-slate-400';
@@ -721,11 +741,12 @@ function finishStage() {
     resultScreen.classList.remove('hidden');
 
     const track = gameState.currentTrack;
-    const totalLevels = currentStageData.levels.length;
-    
+    let totalQInStage = 0;
+    currentStageData.levels.forEach(lvl => { totalQInStage += lvl.questions.length; });
+
     document.getElementById('result-stage-title').textContent = currentStageData.title;
-    document.getElementById('result-correct-count').textContent = totalLevels * 5;
-    document.getElementById('result-total-count').textContent = totalLevels * 5;
+    document.getElementById('result-correct-count').textContent = totalQInStage;
+    document.getElementById('result-total-count').textContent = totalQInStage;
 
     document.getElementById('result-badge-text').textContent = "إتقان تام 🏆";
     document.getElementById('result-badge-text').className = "inline-block px-3 py-1 bg-amber-500/20 text-amber-300 rounded-full text-xs font-bold border border-amber-500/30";
@@ -749,7 +770,8 @@ function finishStage() {
         showToast("🔒 تم قفل اسمك نهائيًا مع توليد كود الشهادة");
     }
 
-    if (getTotalCompletedStages() >= 20) {
+    const totalAllStages = window.stagesDatabase.nahw.length + window.stagesDatabase.sarf.length;
+    if (getTotalCompletedStages() >= totalAllStages) {
         setTimeout(() => { showToast("🎉 مبروك! أكملت جميع المراحل — يمكنك استخراج شهادتك الآن!"); }, 2500);
     }
 
