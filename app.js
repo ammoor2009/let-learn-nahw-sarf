@@ -1,8 +1,8 @@
 /* ============================================================
    لنتعلم قواعد النحو والصرف — المنطق الرئيسي + المزامنة السحابية
+   + دعم زر الرجوع في المتصفح (History API)
    ============================================================ */
 
-// ==================== رابط جوجل شيت (Web App URL) ====================
 const WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbxW-oj2TQlqJBOjTKcHomK0Y_OhVDj3cdh87zBrWFgd4DYQ7RPcOsuxkKLv1FEm5CbB/exec';
 
 const CONFIG = {
@@ -17,7 +17,6 @@ const CONFIG = {
 };
 const RESET_CODE = "فيلادلفيا";
 
-// ==================== الأصوات ====================
 const SOUNDS = {
     ahsant:       { file: 'sounds/Ahsant.mp3',         text: 'أحسنت' },
     momtaz:       { file: 'sounds/Momtaz.mp3',         text: 'ممتاز' },
@@ -76,7 +75,6 @@ function playErrorSound() {
     } catch (e) { }
 }
 
-// ==================== نظام الدروع ====================
 const BADGES = [
     { id: 1, title: "درع البداية المضيئة", rank: "مبتدئ واعد", color: "from-amber-700 to-amber-900", icon: "fa-seedling", minPercent: 1, maxPercent: 20, message: "خطوتك الأولى هي أساس كل نجاح عظيم! لقد أضاءت بدايتك عتمة التردد، فاستمر بهذا العزم المنير." },
     { id: 2, title: "درع سفير الحروف", rank: "سفير اللسان", color: "from-orange-600 to-amber-800", icon: "fa-feather", minPercent: 21, maxPercent: 40, message: "لقد عبرت البدايات وأثبتَّ جدارتك؛ كلماتك تتصاعد بثبات، ومعرفتك تتسع يوماً بعد يوم. إلى الأمام!" },
@@ -86,7 +84,6 @@ const BADGES = [
     { id: 6, title: "درع الأسطورة", rank: "بطل الأبطال الأوحد", color: "from-cyan-400 to-blue-600", icon: "fa-gem", minPercent: 100, maxPercent: 100, message: "المجد لمن صبر واجتهد! لقد أتممت جميع الأسئلة وتجاوزت التحدي الأكبر بجدارة واستحقاق مطلق. أنت الآن أسطورة!" }
 ];
 
-// ==================== الحالة (State) ====================
 let gameState = {
     studentName: "",
     nameLocked: false,
@@ -135,7 +132,6 @@ function saveState() {
     localStorage.setItem(CONFIG.STORAGE_KEY, JSON.stringify(gameState));
 }
 
-// ==================== دوال حساب التقدم ====================
 function getTrackStats(track) {
     let totalQ = 0; let doneQ = 0;
     let totalStages = window.stagesDatabase[track] ? window.stagesDatabase[track].length : 0;
@@ -181,7 +177,6 @@ function generateUUID() {
     return `NM-${new Date().getFullYear()}-${p1}-${p2}`;
 }
 
-// ==================== القلوب ====================
 function regenHearts() {
     if (gameState.hearts >= CONFIG.MAX_HEARTS) { gameState.lastHeartRegenTime = Date.now(); return; }
     const elapsed = Date.now() - gameState.lastHeartRegenTime;
@@ -224,7 +219,6 @@ function startHeartTimerCountdown() {
     tick(); heartTimerInterval = setInterval(tick, 1000);
 }
 
-// ==================== الشاشات ====================
 const welcomeScreen = document.getElementById('welcome-screen');
 const dashboardScreen = document.getElementById('dashboard-screen');
 const stagesScreen = document.getElementById('stages-screen');
@@ -253,7 +247,8 @@ function updateGlobalHeader() {
     if (gameState.studentName) document.getElementById('header-student-name').textContent = gameState.studentName;
 }
 
-// ==================== التنقل ====================
+// ==================== التنقل (مع دعم زر الرجوع) ====================
+
 function startJourney() {
     const input = document.getElementById('student-name-input');
     if (gameState.nameLocked) { goToDashboard(); return; }
@@ -262,7 +257,8 @@ function startJourney() {
     gameState.studentName = name; saveState(); goToDashboard();
 }
 
-function goToDashboard() {
+function goToDashboard(isBack = false) {
+    if (!isBack) history.pushState({ screen: 'dashboard' }, '', '#dashboard');
     regenHearts(); hideAllScreens(); updateGlobalHeader();
     document.getElementById('nav-buttons').classList.remove('hidden');
     if (gameState.hearts <= 0) {
@@ -274,7 +270,8 @@ function goToDashboard() {
     renderProgressBar();
 }
 
-function goToWelcome() {
+function goToWelcome(isBack = false) {
+    if (!isBack) history.pushState({ screen: 'welcome' }, '', '#welcome');
     if (typeof questionTimerInterval !== 'undefined' && questionTimerInterval) clearInterval(questionTimerInterval);
     stopHeartTimer(); hideAllScreens(); globalStatus.classList.add('hidden');
     document.getElementById('nav-buttons').classList.add('hidden'); welcomeScreen.classList.remove('hidden');
@@ -290,7 +287,8 @@ function goToWelcome() {
     }
 }
 
-function openTrack(track) {
+function openTrack(track, isBack = false) {
+    if (!isBack) history.pushState({ screen: 'track', track: track }, '', '#track-' + track);
     gameState.currentTrack = track;
     hideAllScreens(); globalStatus.classList.remove('hidden');
     document.getElementById('nav-buttons').classList.remove('hidden');
@@ -313,7 +311,6 @@ function goToCurrentTrackMap() {
     else goToDashboard();
 }
 
-// ==================== شريط التقدم ====================
 function renderProgressBar() {
     const nahw = getTrackStats('nahw');
     const sarf = getTrackStats('sarf');
@@ -342,7 +339,6 @@ function renderProgressBar() {
     }
 }
 
-// ==================== عرض المراحل ====================
 function renderStagesGrid() {
     const grid = document.getElementById('stages-grid');
     grid.innerHTML = '';
@@ -419,7 +415,8 @@ function openStageRuleModal(stageId) {
 
 function closeStageRuleModal() { stageRuleModal.classList.add('hidden'); }
 
-function openTrainingArena() {
+function openTrainingArena(isBack = false) {
+    if (!isBack) history.pushState({ screen: 'training' }, '', '#training');
     hideAllScreens(); globalStatus.classList.remove('hidden');
     document.getElementById('nav-buttons').classList.remove('hidden');
     trainingScreen.classList.remove('hidden');
@@ -459,7 +456,6 @@ function renderTrainingTopics() {
     });
 }
 
-// ==================== منطق الاختبار ====================
 let currentStageData = null;
 let mainQuestionsPool = [];   
 let reviewQuestionsPool = []; 
@@ -470,7 +466,8 @@ let isProcessingAnswer = false;
 let currentQuestionSource = 'main'; 
 let questionStartTime = 0;
 
-function startStageQuiz(stageId) {
+function startStageQuiz(stageId, isBack = false) {
+    if (!isBack) history.pushState({ screen: 'quiz', track: gameState.currentTrack }, '', '#quiz');
     regenHearts();
     if (gameState.hearts <= 0) { goToDashboard(); return; }
 
@@ -525,7 +522,7 @@ function loadQuizQuestion() {
 
     const qData = currentQuestion;
     questionTimeLeft = CONFIG.QUESTION_TIME;
-    questionStartTime = Date.now(); // تسجيل وقت بداية السؤال
+    questionStartTime = Date.now(); 
     updateQuestionTimerUI();
     startQuestionTimer();
 
@@ -610,7 +607,6 @@ function handleTimeOut() {
         if (!reviewQuestionsPool.includes(qData)) reviewQuestionsPool.push(qData);
     }
 
-    // إرسال المحاولة (انتهاء وقت) للسحابة
     queueAttempt({
         student_id: gameState.uuid || 'N/A',
         student_name: gameState.studentName,
@@ -645,7 +641,7 @@ function submitAnswer(selectedIndex, selectedButton) {
     const qData = currentQuestion;
     const buttons = disableOptions();
     const box = document.getElementById('quiz-feedback-box');
-    const responseTime = Math.round((Date.now() - questionStartTime) / 1000); // بالثواني
+    const responseTime = Math.round((Date.now() - questionStartTime) / 1000);
 
     if (selectedIndex === qData.answer) {
         selectedButton.classList.remove('bg-slate-800/80', 'border-slate-700');
@@ -693,7 +689,6 @@ function submitAnswer(selectedIndex, selectedButton) {
         document.getElementById('feedback-training-tip').classList.remove('hidden');
     }
 
-    // إرسال المحاولة للسحابة
     queueAttempt({
         student_id: gameState.uuid || 'N/A',
         student_name: gameState.studentName,
@@ -760,6 +755,9 @@ function handleLevelComplete() {
 
 function finishStage() {
     if (questionTimerInterval) clearInterval(questionTimerInterval);
+    // إزالة حالة الاختبار من التاريخ عند إنهاء المرحلة
+    history.replaceState({ screen: 'track', track: gameState.currentTrack }, '', '#track-' + gameState.currentTrack);
+    
     hideAllScreens(); globalStatus.classList.remove('hidden');
     document.getElementById('nav-buttons').classList.remove('hidden');
     resultScreen.classList.remove('hidden');
@@ -809,11 +807,11 @@ function restartCurrentStage() {
 
 function confirmQuitQuiz() {
     if (confirm("هل أنت متأكد من إنهاء المرحلة؟ سيتم حفظ ما أنجزته.")) {
-        goToCurrentTrackMap();
+        // العودة خطوة للخلف في التاريخ (سيتم اعتراضها بواسطة popstate)
+        history.back();
     }
 }
 
-// ==================== الشهادة والتصفير ====================
 function openCertificate() {
     if (!gameState.studentName) { showToast("الرجاء إدخال اسمك أولاً"); return; }
     window.open('certificate.html', '_blank');
@@ -855,7 +853,6 @@ function showToast(message) {
     setTimeout(() => toast.remove(), 3500);
 }
 
-// ==================== التشغيل ====================
 window.addEventListener('load', function () {
     loadSavedState();
     regenHearts();
@@ -872,8 +869,43 @@ window.addEventListener('load', function () {
         if (lockIcon) lockIcon.classList.add('hidden');
     }
     
-    // تشغيل المزامنة عند فتح الصفحة
+    // إعداد الحالة الأولى في تاريخ المتصفح
+    if (gameState.studentName) {
+        history.replaceState({ screen: 'dashboard' }, '', '#dashboard');
+        goToDashboard(true);
+    } else {
+        history.replaceState({ screen: 'welcome' }, '', '#welcome');
+        goToWelcome(true);
+    }
+
     processSyncQueue();
+});
+
+// ============================================================
+// 🚀 التقاط زر الرجوع في المتصفح (History API)
+// ============================================================
+window.addEventListener('popstate', function(event) {
+    const state = event.state;
+    if (!state) {
+        if (gameState.studentName) goToDashboard(true);
+        else goToWelcome(true);
+    } else if (state.screen === 'welcome') {
+        goToWelcome(true);
+    } else if (state.screen === 'dashboard') {
+        goToDashboard(true);
+    } else if (state.screen === 'track') {
+        openTrack(state.track, true);
+    } else if (state.screen === 'training') {
+        openTrainingArena(true);
+    } else if (state.screen === 'quiz') {
+        // إذا ضغط الطالب زر الرجوع أثناء اللعب، نعيده لخريطة المراحل
+        if (confirm("هل أنت متأكد من إنهاء المرحلة؟ سيتم حفظ ما أنجزته.")) {
+            openTrack(gameState.currentTrack, true);
+        } else {
+            // إذا رفض، نعيد الحالة للاختبار
+            history.pushState({ screen: 'quiz', track: gameState.currentTrack }, '', '#quiz');
+        }
+    }
 });
 
 // ============================================================
@@ -952,5 +984,4 @@ async function processSyncQueue() {
     }
 }
 
-// استماع لعودة الإنترنت
 window.addEventListener('online', processSyncQueue);
