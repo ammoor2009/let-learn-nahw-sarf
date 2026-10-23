@@ -1,6 +1,5 @@
 /* ============================================================
-   لنتعلم قواعد النحو والصرف — المنطق الرئيسي + المزامنة السحابية
-   + دعم زر الرجوع في المتصفح (History API)
+   لنتعلم قواعد النحو والصرف — النسخة النهائية (بحثية + زر رجوع)
    ============================================================ */
 
 const WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbxW-oj2TQlqJBOjTKcHomK0Y_OhVDj3cdh87zBrWFgd4DYQ7RPcOsuxkKLv1FEm5CbB/exec';
@@ -13,7 +12,7 @@ const CONFIG = {
     POINTS_PER_CORRECT: 10,
     STREAK_FOR_BONUS_HEART: 5,
     STORAGE_KEY: 'let_learn_nahw_sarf_state_v3',
-    STATE_VERSION: 3.1
+    STATE_VERSION: 3.2
 };
 const RESET_CODE = "فيلادلفيا";
 
@@ -38,7 +37,6 @@ function playSound(key) {
         if (p && p.catch) p.catch(() => speakText(sound.text));
     } catch (e) { speakText(sound.text); }
 }
-
 function speakText(text) {
     if ('speechSynthesis' in window) {
         window.speechSynthesis.cancel();
@@ -47,7 +45,6 @@ function speakText(text) {
         window.speechSynthesis.speak(u);
     }
 }
-
 function pickPraiseSound() {
     const s = gameState.streak;
     if (s >= 10) return 'momtazAbda3t';
@@ -57,7 +54,6 @@ function pickPraiseSound() {
     const light = ['ahsant', 'ejabaSaheha', 'to3gebony', 'elaAlamam'];
     return light[Math.floor(Math.random() * light.length)];
 }
-
 let audioCtx = null;
 function playErrorSound() {
     try {
@@ -85,21 +81,13 @@ const BADGES = [
 ];
 
 let gameState = {
-    studentName: "",
-    nameLocked: false,
-    uuid: "",
-    hearts: CONFIG.MAX_HEARTS,
-    score: 0,
-    streak: 0,
-    currentTrack: null,
-    currentStageId: null,
-    currentLevel: 1,
+    studentName: "", nameLocked: false, uuid: "", hearts: CONFIG.MAX_HEARTS, score: 0, streak: 0,
+    currentTrack: null, currentStageId: null, currentLevel: 1,
     tracks: {
         nahw: { unlockedStages: [1], completedStages: [], stageProgress: {} },
         sarf: { unlockedStages: [1], completedStages: [], stageProgress: {} }
     },
-    lastHeartRegenTime: Date.now(),
-    version: CONFIG.STATE_VERSION
+    lastHeartRegenTime: Date.now(), version: CONFIG.STATE_VERSION
 };
 
 window.stagesDatabase = window.stagesDatabase || { nahw: [], sarf: [] };
@@ -122,12 +110,9 @@ function loadSavedState() {
 function saveState() {
     gameState.version = CONFIG.STATE_VERSION;
     gameState.meta = {
-        totalNahwQuestions: getTrackStats('nahw').totalQ,
-        totalSarfQuestions: getTrackStats('sarf').totalQ,
-        totalNahwStages: window.stagesDatabase.nahw.length,
-        totalSarfStages: window.stagesDatabase.sarf.length,
-        doneNahwQuestions: getTrackStats('nahw').doneQ,
-        doneSarfQuestions: getTrackStats('sarf').doneQ
+        totalNahwQuestions: getTrackStats('nahw').totalQ, totalSarfQuestions: getTrackStats('sarf').totalQ,
+        totalNahwStages: window.stagesDatabase.nahw.length, totalSarfStages: window.stagesDatabase.sarf.length,
+        doneNahwQuestions: getTrackStats('nahw').doneQ, doneSarfQuestions: getTrackStats('sarf').doneQ
     };
     localStorage.setItem(CONFIG.STORAGE_KEY, JSON.stringify(gameState));
 }
@@ -136,13 +121,9 @@ function getTrackStats(track) {
     let totalQ = 0; let doneQ = 0;
     let totalStages = window.stagesDatabase[track] ? window.stagesDatabase[track].length : 0;
     let completedStages = gameState.tracks[track].completedStages.length;
-
     if (window.stagesDatabase[track]) {
-        window.stagesDatabase[track].forEach(stage => {
-            stage.levels.forEach(lvl => { totalQ += lvl.questions.length; });
-        });
+        window.stagesDatabase[track].forEach(stage => { stage.levels.forEach(lvl => { totalQ += lvl.questions.length; }); });
     }
-
     for (let stageId in gameState.tracks[track].stageProgress) {
         let stage = window.stagesDatabase[track] ? window.stagesDatabase[track].find(s => s.id == stageId) : null;
         if (stage) {
@@ -155,10 +136,7 @@ function getTrackStats(track) {
     return { totalQ, doneQ, totalStages, completedStages };
 }
 
-function getTotalCompletedStages() {
-    return gameState.tracks.nahw.completedStages.length + gameState.tracks.sarf.completedStages.length;
-}
-
+function getTotalCompletedStages() { return gameState.tracks.nahw.completedStages.length + gameState.tracks.sarf.completedStages.length; }
 function getCurrentBadge() {
     const totalStages = window.stagesDatabase.nahw.length + window.stagesDatabase.sarf.length;
     if (totalStages === 0) return null;
@@ -170,13 +148,11 @@ function getCurrentBadge() {
     }
     return BADGES[0];
 }
-
 function generateUUID() {
     const p1 = Math.random().toString(36).substring(2, 6).toUpperCase();
     const p2 = Math.random().toString(36).substring(2, 6).toUpperCase();
     return `NM-${new Date().getFullYear()}-${p1}-${p2}`;
 }
-
 function regenHearts() {
     if (gameState.hearts >= CONFIG.MAX_HEARTS) { gameState.lastHeartRegenTime = Date.now(); return; }
     const elapsed = Date.now() - gameState.lastHeartRegenTime;
@@ -188,19 +164,16 @@ function regenHearts() {
         saveState();
     }
 }
-
 function loseHeart() {
     const wasFull = gameState.hearts >= CONFIG.MAX_HEARTS;
     gameState.hearts = Math.max(0, gameState.hearts - 1);
     if (wasFull) gameState.lastHeartRegenTime = Date.now();
     updateGlobalHeader(); saveState();
 }
-
 function gainHeart() {
     gameState.hearts = Math.min(CONFIG.MAX_HEARTS, gameState.hearts + 1);
     if (gameState.hearts >= CONFIG.MAX_HEARTS) gameState.lastHeartRegenTime = Date.now();
 }
-
 let heartTimerInterval = null;
 function stopHeartTimer() { if (heartTimerInterval) { clearInterval(heartTimerInterval); heartTimerInterval = null; } }
 function startHeartTimerCountdown() {
@@ -231,23 +204,18 @@ const stageRuleModal = document.getElementById('stage-rule-modal');
 
 function hideAllScreens() {
     [welcomeScreen, dashboardScreen, stagesScreen, trainingScreen, quizScreen, resultScreen, outOfHeartsScreen, stageRuleModal,
-     document.getElementById('rules-modal'), document.getElementById('reset-modal')]
-        .forEach(el => el && el.classList.add('hidden'));
+     document.getElementById('rules-modal'), document.getElementById('reset-modal')].forEach(el => el && el.classList.add('hidden'));
 }
-
 function formatNumber(n) {
     if (n >= 1000000) return (n / 1000000).toFixed(1) + 'M';
     if (n >= 1000) return (n / 1000).toFixed(1) + 'K';
     return n;
 }
-
 function updateGlobalHeader() {
     document.getElementById('header-hearts').textContent = formatNumber(gameState.hearts);
     document.getElementById('header-score').textContent = formatNumber(gameState.score);
     if (gameState.studentName) document.getElementById('header-student-name').textContent = gameState.studentName;
 }
-
-// ==================== التنقل (مع دعم زر الرجوع) ====================
 
 function startJourney() {
     const input = document.getElementById('student-name-input');
@@ -256,7 +224,6 @@ function startJourney() {
     if (!name) { showToast("الرجاء إدخال اسمك الكريم للبدء!"); return; }
     gameState.studentName = name; saveState(); goToDashboard();
 }
-
 function goToDashboard(isBack = false) {
     if (!isBack) history.pushState({ screen: 'dashboard' }, '', '#dashboard');
     regenHearts(); hideAllScreens(); updateGlobalHeader();
@@ -269,7 +236,6 @@ function goToDashboard(isBack = false) {
     document.getElementById('welcome-banner-title').textContent = `أهلاً بك يا ${gameState.studentName || 'طالب العلم'}`;
     renderProgressBar();
 }
-
 function goToWelcome(isBack = false) {
     if (!isBack) history.pushState({ screen: 'welcome' }, '', '#welcome');
     if (typeof questionTimerInterval !== 'undefined' && questionTimerInterval) clearInterval(questionTimerInterval);
@@ -286,66 +252,49 @@ function goToWelcome(isBack = false) {
         if (lockIcon) lockIcon.classList.add('hidden');
     }
 }
-
 function openTrack(track, isBack = false) {
     if (!isBack) history.pushState({ screen: 'track', track: track }, '', '#track-' + track);
     gameState.currentTrack = track;
     hideAllScreens(); globalStatus.classList.remove('hidden');
     document.getElementById('nav-buttons').classList.remove('hidden');
     stagesScreen.classList.remove('hidden');
-    
     const isNahw = track === 'nahw';
     document.getElementById('stages-track-title').textContent = isNahw ? 'خريطة النحو' : 'خريطة الصرف';
     document.getElementById('stages-track-desc').textContent = isNahw ? 'مراحل في قواعد النحو' : 'مراحل في علم الصرف';
     document.getElementById('stages-track-label').textContent = isNahw ? 'المراحل النحوية' : 'المراحل الصرفية';
-    
     const iconDiv = document.getElementById('stages-track-icon');
     iconDiv.className = isNahw ? 'p-3 bg-emerald-500/20 rounded-xl text-emerald-300 border border-emerald-500/30' : 'p-3 bg-cyan-500/20 rounded-xl text-cyan-300 border border-cyan-500/30';
     iconDiv.innerHTML = isNahw ? '<i class="fa-solid fa-book-open text-2xl"></i>' : '<i class="fa-solid fa-language text-2xl"></i>';
-    
     renderStagesGrid();
 }
-
 function goToCurrentTrackMap() {
     if (gameState.currentTrack) openTrack(gameState.currentTrack);
     else goToDashboard();
 }
-
 function renderProgressBar() {
-    const nahw = getTrackStats('nahw');
-    const sarf = getTrackStats('sarf');
-    const totalDone = nahw.doneQ + sarf.doneQ;
-    const totalQ = nahw.totalQ + sarf.totalQ;
+    const nahw = getTrackStats('nahw'); const sarf = getTrackStats('sarf');
+    const totalDone = nahw.doneQ + sarf.doneQ; const totalQ = nahw.totalQ + sarf.totalQ;
     const percent = totalQ === 0 ? 0 : Math.round((totalDone / totalQ) * 100);
-    
     document.getElementById('progress-total-questions').textContent = `${totalDone} / ${totalQ}`;
     document.getElementById('progress-nahw').textContent = `${nahw.doneQ}/${nahw.totalQ}`;
     document.getElementById('progress-sarf').textContent = `${sarf.doneQ}/${sarf.totalQ}`;
     document.getElementById('progress-percent').textContent = `${percent}%`;
     document.getElementById('progress-fill').style.width = `${percent}%`;
-    
     const currentBadge = getCurrentBadge();
-    const badgeEl = document.getElementById('progress-badge');
-    const rankEl = document.getElementById('progress-rank');
-    
+    const badgeEl = document.getElementById('progress-badge'); const rankEl = document.getElementById('progress-rank');
     if (currentBadge) {
         badgeEl.className = `w-10 h-10 rounded-xl bg-gradient-to-br ${currentBadge.color} flex items-center justify-center text-white shadow-lg`;
-        badgeEl.innerHTML = `<i class="fa-solid ${currentBadge.icon}"></i>`;
-        rankEl.textContent = currentBadge.rank;
+        badgeEl.innerHTML = `<i class="fa-solid ${currentBadge.icon}"></i>`; rankEl.textContent = currentBadge.rank;
     } else {
         badgeEl.className = `w-10 h-10 rounded-xl bg-slate-800 flex items-center justify-center text-slate-500 shadow`;
-        badgeEl.innerHTML = `<i class="fa-solid fa-lock"></i>`;
-        rankEl.textContent = "لم تبدأ رحلتك بعد";
+        badgeEl.innerHTML = `<i class="fa-solid fa-lock"></i>`; rankEl.textContent = "لم تبدأ رحلتك بعد";
     }
 }
-
 function renderStagesGrid() {
-    const grid = document.getElementById('stages-grid');
-    grid.innerHTML = '';
+    const grid = document.getElementById('stages-grid'); grid.innerHTML = '';
     const track = gameState.currentTrack;
     const stages = [...window.stagesDatabase[track]].sort((a, b) => a.id - b.id);
     document.getElementById('stages-count-badge').textContent = `${stages.length} مراحل`;
-
     stages.forEach((stage, idx) => {
         const trackData = gameState.tracks[track];
         const isUnlocked = trackData.unlockedStages.includes(stage.id) || idx === 0;
@@ -353,7 +302,6 @@ function renderStagesGrid() {
         const progress = trackData.stageProgress[stage.id] || { completedLevels: [] };
         const totalLevels = stage.levels ? stage.levels.length : 0;
         const completedLevels = progress.completedLevels.length;
-
         const card = document.createElement('div');
         card.className = `bg-slate-900/80 backdrop-blur-md rounded-3xl p-6 border ${isUnlocked ? 'border-emerald-500/30 shadow-xl' : 'border-slate-800 opacity-60'} transition flex flex-col justify-between group relative overflow-hidden`;
         card.innerHTML = `
@@ -384,20 +332,17 @@ function renderStagesGrid() {
         grid.appendChild(card);
     });
 }
-
 function openStageRuleModal(stageId) {
     const track = gameState.currentTrack;
     const stage = window.stagesDatabase[track].find(s => s.id === stageId);
     if (!stage) return;
     const idx = window.stagesDatabase[track].findIndex(s => s.id === stageId);
     const isUnlocked = gameState.tracks[track].unlockedStages.includes(stageId) || idx === 0;
-
     document.getElementById('modal-rule-title').textContent = `دليل قسم: ${stage.title}`;
     document.getElementById('modal-rule-content').textContent = stage.ruleSummary;
     const iconContainer = document.getElementById('modal-rule-icon');
     iconContainer.className = `w-12 h-12 rounded-2xl bg-gradient-to-br ${stage.color} flex items-center justify-center text-white shadow-lg`;
     iconContainer.innerHTML = `<i class="fa-solid ${stage.icon} text-xl"></i>`;
-
     const startBtn = document.getElementById('modal-start-quiz-btn');
     if (isUnlocked) {
         startBtn.disabled = false;
@@ -412,30 +357,21 @@ function openStageRuleModal(stageId) {
     }
     stageRuleModal.classList.remove('hidden');
 }
-
 function closeStageRuleModal() { stageRuleModal.classList.add('hidden'); }
-
 function openTrainingArena(isBack = false) {
     if (!isBack) history.pushState({ screen: 'training' }, '', '#training');
     hideAllScreens(); globalStatus.classList.remove('hidden');
     document.getElementById('nav-buttons').classList.remove('hidden');
-    trainingScreen.classList.remove('hidden');
-    renderTrainingTopics();
+    trainingScreen.classList.remove('hidden'); renderTrainingTopics();
 }
-
 function renderTrainingTopics() {
-    const container = document.getElementById('training-topics-container');
-    container.innerHTML = '';
+    const container = document.getElementById('training-topics-container'); container.innerHTML = '';
     ['nahw', 'sarf'].forEach(track => {
         const trackName = track === 'nahw' ? 'النحو' : 'الصرف';
         const trackTitle = document.createElement('h3');
         trackTitle.className = "text-xl font-bold text-emerald-300 mb-4 border-b border-slate-700 pb-2";
-        trackTitle.textContent = `مسار ${trackName}`;
-        container.appendChild(trackTitle);
-
-        const grid = document.createElement('div');
-        grid.className = "grid grid-cols-1 md:grid-cols-2 gap-4 mb-8";
-        
+        trackTitle.textContent = `مسار ${trackName}`; container.appendChild(trackTitle);
+        const grid = document.createElement('div'); grid.className = "grid grid-cols-1 md:grid-cols-2 gap-4 mb-8";
         [...window.stagesDatabase[track]].sort((a, b) => a.id - b.id).forEach(stage => {
             const card = document.createElement('div');
             card.className = "bg-slate-900/80 backdrop-blur-md rounded-3xl p-6 border border-teal-500/20 shadow-xl space-y-4 flex flex-col justify-between";
@@ -470,81 +406,54 @@ function startStageQuiz(stageId, isBack = false) {
     if (!isBack) history.pushState({ screen: 'quiz', track: gameState.currentTrack }, '', '#quiz');
     regenHearts();
     if (gameState.hearts <= 0) { goToDashboard(); return; }
-
     const track = gameState.currentTrack;
     const stage = window.stagesDatabase[track].find(s => s.id === stageId);
     if (!stage || !stage.levels || stage.levels.length === 0) return;
-
     const trackData = gameState.tracks[track];
     const progress = trackData.stageProgress[stageId] || { completedLevels: [] };
-    
     let startLevel = 1;
     for (let i = 1; i <= stage.levels.length; i++) {
         if (!progress.completedLevels.includes(i)) { startLevel = i; break; }
     }
     if (progress.completedLevels.length >= stage.levels.length) startLevel = 1;
-
-    currentStageData = stage;
-    gameState.currentStageId = stageId;
-    gameState.currentLevel = startLevel;
+    currentStageData = stage; gameState.currentStageId = stageId; gameState.currentLevel = startLevel;
     reviewQuestionsPool = []; 
-    
     loadLevelQuestions();
-
     hideAllScreens(); globalStatus.classList.remove('hidden');
     document.getElementById('nav-buttons').classList.remove('hidden');
     quizScreen.classList.remove('hidden');
-    updateGlobalHeader();
-    loadQuizQuestion();
+    updateGlobalHeader(); loadQuizQuestion();
 }
-
 function loadLevelQuestions() {
     const levelData = currentStageData.levels[gameState.currentLevel - 1];
     mainQuestionsPool = [...levelData.questions];
 }
-
 function loadQuizQuestion() {
     if (questionTimerInterval) clearInterval(questionTimerInterval);
     isProcessingAnswer = false;
-
-    if (mainQuestionsPool.length === 0 && reviewQuestionsPool.length === 0) {
-        handleLevelComplete();
-        return;
-    }
-
+    if (mainQuestionsPool.length === 0 && reviewQuestionsPool.length === 0) { handleLevelComplete(); return; }
     if (mainQuestionsPool.length > 0) {
-        currentQuestionSource = 'main';
-        currentQuestion = mainQuestionsPool[Math.floor(Math.random() * mainQuestionsPool.length)];
+        currentQuestionSource = 'main'; currentQuestion = mainQuestionsPool[Math.floor(Math.random() * mainQuestionsPool.length)];
     } else {
-        currentQuestionSource = 'review';
-        currentQuestion = reviewQuestionsPool[Math.floor(Math.random() * reviewQuestionsPool.length)];
+        currentQuestionSource = 'review'; currentQuestion = reviewQuestionsPool[Math.floor(Math.random() * reviewQuestionsPool.length)];
     }
-
     const qData = currentQuestion;
-    questionTimeLeft = CONFIG.QUESTION_TIME;
-    questionStartTime = Date.now(); 
-    updateQuestionTimerUI();
-    startQuestionTimer();
-
+    questionTimeLeft = CONFIG.QUESTION_TIME; questionStartTime = Date.now(); 
+    updateQuestionTimerUI(); startQuestionTimer();
     const levelData = currentStageData.levels[gameState.currentLevel - 1];
     const totalInLevel = levelData.questions.length;
-    
     document.getElementById('quiz-mode-label').textContent = currentQuestionSource === 'review' ? 'مراجعة:' : 'السؤال:';
     document.getElementById('quiz-mode-label').className = currentQuestionSource === 'review' ? 'text-amber-400 font-bold' : 'text-slate-400';
     document.getElementById('current-q-index').textContent = currentQuestionSource === 'review' ? '!' : Math.min(totalInLevel - mainQuestionsPool.length + 1, totalInLevel);
     document.getElementById('total-q-index').textContent = totalInLevel;
     document.getElementById('streak-counter').textContent = gameState.streak;
     document.getElementById('quiz-progress-bar').style.width = `${((totalInLevel - mainQuestionsPool.length) / totalInLevel) * 100}%`;
-    
     document.getElementById('quiz-stage-badge').textContent = `${currentStageData.title} — المستوى ${gameState.currentLevel}`;
     document.getElementById('quiz-difficulty-badge').textContent = qData.difficulty || 'عادي';
     document.getElementById('quiz-question-text').textContent = qData.q;
     document.getElementById('quiz-feedback-box').classList.add('hidden');
-
-    const optionsContainer = document.getElementById('quiz-options-container');
-    optionsContainer.innerHTML = '';
+    const optionsContainer = document.getElementById('quiz-options-container'); optionsContainer.innerHTML = '';
     const labels = ['أ', 'ب', 'ج', 'د'];
-
     qData.options.forEach((opt, i) => {
         const btn = document.createElement('button');
         btn.className = "option-btn w-full text-right p-4 rounded-2xl bg-slate-800/80 hover:bg-slate-700/80 border border-slate-700 transition font-semibold text-white flex items-center justify-between group shadow-md";
@@ -552,101 +461,72 @@ function loadQuizQuestion() {
             <span class="text-sm md:text-base">${opt}</span>
             <span class="w-8 h-8 rounded-xl bg-slate-700/80 flex items-center justify-center text-xs text-slate-300 group-hover:bg-emerald-600 group-hover:text-white transition">${labels[i] || i + 1}</span>
         `;
-        btn.onclick = () => submitAnswer(i, btn);
-        optionsContainer.appendChild(btn);
+        btn.onclick = () => submitAnswer(i, btn); optionsContainer.appendChild(btn);
     });
 }
-
 function startQuestionTimer() {
     questionTimerInterval = setInterval(() => {
         questionTimeLeft--; updateQuestionTimerUI();
         if (questionTimeLeft <= 0) { clearInterval(questionTimerInterval); handleTimeOut(); }
     }, 1000);
 }
-
 function updateQuestionTimerUI() {
-    const txt = document.getElementById('question-timer-text');
-    const bar = document.getElementById('question-timer-bar');
+    const txt = document.getElementById('question-timer-text'); const bar = document.getElementById('question-timer-bar');
     if (!txt || !bar) return;
     txt.textContent = `${questionTimeLeft} ثانية`;
     bar.style.width = `${(questionTimeLeft / CONFIG.QUESTION_TIME) * 100}%`;
     if (questionTimeLeft <= 10) {
-        bar.className = "timer-bar bg-gradient-to-r from-rose-500 to-amber-500 h-full";
-        txt.className = "font-bold text-rose-400 font-mono";
+        bar.className = "timer-bar bg-gradient-to-r from-rose-500 to-amber-500 h-full"; txt.className = "font-bold text-rose-400 font-mono";
     } else {
-        bar.className = "timer-bar bg-gradient-to-r from-emerald-500 to-teal-500 h-full";
-        txt.className = "font-bold text-emerald-400 font-mono";
+        bar.className = "timer-bar bg-gradient-to-r from-emerald-500 to-teal-500 h-full"; txt.className = "font-bold text-emerald-400 font-mono";
     }
 }
-
 function disableOptions() {
     const buttons = document.getElementById('quiz-options-container').getElementsByTagName('button');
     for (let b of buttons) { b.disabled = true; b.classList.add('opacity-80'); }
     return buttons;
 }
-
 function revealCorrect(buttons, answerIdx) {
     buttons[answerIdx].classList.remove('bg-slate-800/80', 'border-slate-700');
     buttons[answerIdx].classList.add('bg-emerald-600/80', 'border-emerald-400');
 }
-
 function handleTimeOut() {
     if (!currentQuestion || isProcessingAnswer) return;
     isProcessingAnswer = true;
-    const qData = currentQuestion;
-    const buttons = disableOptions();
+    const qData = currentQuestion; const buttons = disableOptions();
     revealCorrect(buttons, qData.answer);
-
-    playErrorSound();
-    gameState.streak = 0;
-    loseHeart();
-
+    playErrorSound(); gameState.streak = 0; loseHeart();
     if (currentQuestionSource === 'main') {
         const idx = mainQuestionsPool.indexOf(qData);
         if (idx > -1) mainQuestionsPool.splice(idx, 1);
         if (!reviewQuestionsPool.includes(qData)) reviewQuestionsPool.push(qData);
     }
-
     queueAttempt({
-        student_id: gameState.uuid || 'N/A',
-        student_name: gameState.studentName,
-        track: gameState.currentTrack,
-        stage_id: gameState.currentStageId,
-        stage_title: currentStageData.title,
-        question_text: qData.q,
-        selected_answer: "انتهى الوقت",
-        correct_answer: qData.options[qData.answer],
-        is_correct: false,
-        response_time: CONFIG.QUESTION_TIME
+        student_id: gameState.uuid || 'N/A', student_name: gameState.studentName, track: gameState.currentTrack,
+        stage_id: gameState.currentStageId, stage_title: currentStageData.title, question_text: qData.q,
+        selected_answer: "انتهى الوقت", correct_answer: qData.options[qData.answer], is_correct: false,
+        response_time: CONFIG.QUESTION_TIME, attempt_context: currentQuestionSource, first_attempt_correct: false, is_timeout: true
     });
-
     const box = document.getElementById('quiz-feedback-box');
     document.getElementById('feedback-header').innerHTML = `<i class="fa-solid fa-clock text-rose-400"></i> <span class="text-rose-300">انتهى الوقت! سيُضاف للمراجعة — خُصم قلب</span>`;
     document.getElementById('feedback-explanation').textContent = `الإجابة الصحيحة: "${qData.options[qData.answer]}".\n${qData.explanation}`;
     document.getElementById('feedback-training-tip').classList.remove('hidden');
     box.className = "p-5 rounded-2xl border bg-rose-950/60 border-rose-500/40 space-y-3 animate-fade-in";
     box.classList.remove('hidden');
-
     document.getElementById('streak-counter').textContent = gameState.streak;
     updateGlobalHeader(); saveState();
-
     if (gameState.hearts <= 0) setTimeout(goToDashboard, 1800);
 }
-
 function submitAnswer(selectedIndex, selectedButton) {
     if (questionTimerInterval) clearInterval(questionTimerInterval);
     if (!currentQuestion || isProcessingAnswer) return;
     isProcessingAnswer = true;
-
-    const qData = currentQuestion;
-    const buttons = disableOptions();
+    const qData = currentQuestion; const buttons = disableOptions();
     const box = document.getElementById('quiz-feedback-box');
     const responseTime = Math.round((Date.now() - questionStartTime) / 1000);
-
     if (selectedIndex === qData.answer) {
         selectedButton.classList.remove('bg-slate-800/80', 'border-slate-700');
         selectedButton.classList.add('bg-emerald-600/90', 'border-emerald-400');
-
         if (currentQuestionSource === 'main') {
             gameState.score += CONFIG.POINTS_PER_CORRECT;
             const idx = mainQuestionsPool.indexOf(qData);
@@ -655,15 +535,11 @@ function submitAnswer(selectedIndex, selectedButton) {
             const idx = reviewQuestionsPool.indexOf(qData);
             if (idx > -1) reviewQuestionsPool.splice(idx, 1);
         }
-        
         gameState.streak++;
-        const soundKey = pickPraiseSound();
-        playSound(soundKey);
-
+        const soundKey = pickPraiseSound(); playSound(soundKey);
         if (gameState.streak > 0 && gameState.streak % CONFIG.STREAK_FOR_BONUS_HEART === 0) {
             gainHeart(); showToast("🎉 حصلت على قلب إضافي!");
         }
-
         box.className = "p-5 rounded-2xl border bg-emerald-950/60 border-emerald-500/40 space-y-3 animate-fade-in";
         document.getElementById('feedback-header').innerHTML = `<i class="fa-solid fa-circle-check text-emerald-400"></i> <span class="text-emerald-300">${SOUNDS[soundKey].text}</span>`;
         document.getElementById('feedback-explanation').textContent = qData.explanation;
@@ -672,311 +548,169 @@ function submitAnswer(selectedIndex, selectedButton) {
         selectedButton.classList.remove('bg-slate-800/80', 'border-slate-700');
         selectedButton.classList.add('bg-rose-600/90', 'border-rose-400');
         revealCorrect(buttons, qData.answer);
-
-        playErrorSound();
-        gameState.streak = 0;
-        loseHeart();
-
+        playErrorSound(); gameState.streak = 0; loseHeart();
         if (currentQuestionSource === 'main') {
             const idx = mainQuestionsPool.indexOf(qData);
             if (idx > -1) mainQuestionsPool.splice(idx, 1);
             if (!reviewQuestionsPool.includes(qData)) reviewQuestionsPool.push(qData);
         } 
-
         box.className = "p-5 rounded-2xl border bg-rose-950/60 border-rose-500/40 space-y-3 animate-fade-in";
         document.getElementById('feedback-header').innerHTML = `<i class="fa-solid fa-circle-xmark text-rose-400"></i> <span class="text-rose-300">إجابة خاطئة — سيُعاد عليك في المراجعة</span>`;
         document.getElementById('feedback-explanation').textContent = `الإجابة الصحيحة: "${qData.options[qData.answer]}".\n${qData.explanation}`;
         document.getElementById('feedback-training-tip').classList.remove('hidden');
     }
-
     queueAttempt({
-        student_id: gameState.uuid || 'N/A',
-        student_name: gameState.studentName,
-        track: gameState.currentTrack,
-        stage_id: gameState.currentStageId,
-        stage_title: currentStageData.title,
-        question_text: qData.q,
-        selected_answer: qData.options[selectedIndex],
-        correct_answer: qData.options[qData.answer],
-        is_correct: (selectedIndex === qData.answer),
-        response_time: responseTime
+        student_id: gameState.uuid || 'N/A', student_name: gameState.studentName, track: gameState.currentTrack,
+        stage_id: gameState.currentStageId, stage_title: currentStageData.title, question_text: qData.q,
+        selected_answer: qData.options[selectedIndex], correct_answer: qData.options[qData.answer],
+        is_correct: (selectedIndex === qData.answer), response_time: responseTime,
+        attempt_context: currentQuestionSource, 
+        first_attempt_correct: (currentQuestionSource === 'main' && selectedIndex === qData.answer), 
+        is_timeout: false
     });
-
     document.getElementById('streak-counter').textContent = gameState.streak;
-    box.classList.remove('hidden');
-    updateGlobalHeader(); saveState();
-
-    if (gameState.hearts <= 0 && selectedIndex !== qData.answer) {
-        setTimeout(goToDashboard, 1800);
-    }
+    box.classList.remove('hidden'); updateGlobalHeader(); saveState();
+    if (gameState.hearts <= 0 && selectedIndex !== qData.answer) setTimeout(goToDashboard, 1800);
 }
-
-function nextQuestion() {
-    loadQuizQuestion();
-}
-
+function nextQuestion() { loadQuizQuestion(); }
 function handleLevelComplete() {
-    const track = gameState.currentTrack;
-    const stageId = gameState.currentStageId;
-    if (!gameState.tracks[track].stageProgress[stageId]) {
-        gameState.tracks[track].stageProgress[stageId] = { completedLevels: [] };
-    }
+    const track = gameState.currentTrack; const stageId = gameState.currentStageId;
+    if (!gameState.tracks[track].stageProgress[stageId]) gameState.tracks[track].stageProgress[stageId] = { completedLevels: [] };
     if (!gameState.tracks[track].stageProgress[stageId].completedLevels.includes(gameState.currentLevel)) {
         gameState.tracks[track].stageProgress[stageId].completedLevels.push(gameState.currentLevel);
     }
     saveState();
-
-    const nextLevel = gameState.currentLevel + 1;
-    const totalLevels = currentStageData.levels.length;
-
-    if (nextLevel > totalLevels) {
-        finishStage();
-        return;
-    }
-
+    const nextLevel = gameState.currentLevel + 1; const totalLevels = currentStageData.levels.length;
+    if (nextLevel > totalLevels) { finishStage(); return; }
     playSound('momtazAbda3t');
     const box = document.getElementById('quiz-feedback-box');
     box.className = "p-5 rounded-2xl border bg-emerald-950/60 border-emerald-500/40 space-y-3 animate-fade-in";
     document.getElementById('feedback-header').innerHTML = `<i class="fa-solid fa-trophy text-amber-400"></i> <span class="text-emerald-300">أتممت المستوى ${gameState.currentLevel} بنجاح!</span>`;
     document.getElementById('feedback-explanation').textContent = `استعد للمستوى ${nextLevel} من ${totalLevels}...`;
-    document.getElementById('feedback-training-tip').classList.add('hidden');
-    box.classList.remove('hidden');
-    document.getElementById('quiz-options-container').innerHTML = '';
-    document.getElementById('quiz-question-text').textContent = '...';
-    
+    document.getElementById('feedback-training-tip').classList.add('hidden'); box.classList.remove('hidden');
+    document.getElementById('quiz-options-container').innerHTML = ''; document.getElementById('quiz-question-text').textContent = '...';
     setTimeout(() => {
-        gameState.currentLevel = nextLevel;
-        reviewQuestionsPool = []; 
-        loadLevelQuestions();
-        currentQuestion = null;
-        loadQuizQuestion();
+        gameState.currentLevel = nextLevel; reviewQuestionsPool = []; 
+        loadLevelQuestions(); currentQuestion = null; loadQuizQuestion();
     }, 2000);
 }
-
 function finishStage() {
     if (questionTimerInterval) clearInterval(questionTimerInterval);
-    // إزالة حالة الاختبار من التاريخ عند إنهاء المرحلة
     history.replaceState({ screen: 'track', track: gameState.currentTrack }, '', '#track-' + gameState.currentTrack);
-    
     hideAllScreens(); globalStatus.classList.remove('hidden');
-    document.getElementById('nav-buttons').classList.remove('hidden');
-    resultScreen.classList.remove('hidden');
-
-    const track = gameState.currentTrack;
-    let totalQInStage = 0;
+    document.getElementById('nav-buttons').classList.remove('hidden'); resultScreen.classList.remove('hidden');
+    const track = gameState.currentTrack; let totalQInStage = 0;
     currentStageData.levels.forEach(lvl => { totalQInStage += lvl.questions.length; });
-
     document.getElementById('result-stage-title').textContent = currentStageData.title;
-    document.getElementById('result-correct-count').textContent = totalQInStage;
-    document.getElementById('result-total-count').textContent = totalQInStage;
-
+    document.getElementById('result-correct-count').textContent = totalQInStage; document.getElementById('result-total-count').textContent = totalQInStage;
     document.getElementById('result-badge-text').textContent = "إتقان تام 🏆";
     document.getElementById('result-badge-text').className = "inline-block px-3 py-1 bg-amber-500/20 text-amber-300 rounded-full text-xs font-bold border border-amber-500/30";
     document.getElementById('result-trophy-icon').className = "fa-solid fa-trophy text-5xl text-amber-400";
-    document.getElementById('result-title-text').textContent = "أتممت جميع المستويات بإتقان!";
-    playSound('momtazAbda3t');
-
-    if (!gameState.tracks[track].completedStages.includes(currentStageData.id)) {
-        gameState.tracks[track].completedStages.push(currentStageData.id);
-    }
-    
+    document.getElementById('result-title-text').textContent = "أتممت جميع المستويات بإتقان!"; playSound('momtazAbda3t');
+    if (!gameState.tracks[track].completedStages.includes(currentStageData.id)) gameState.tracks[track].completedStages.push(currentStageData.id);
     const nextId = currentStageData.id + 1;
     if (!gameState.tracks[track].unlockedStages.includes(nextId)) {
         const exists = window.stagesDatabase[track].find(s => s.id === nextId);
         if (exists) gameState.tracks[track].unlockedStages.push(nextId);
     }
-
     if (track === 'nahw' && currentStageData.id === 1 && !gameState.nameLocked) {
-        gameState.nameLocked = true;
-        if (!gameState.uuid) gameState.uuid = generateUUID();
+        gameState.nameLocked = true; if (!gameState.uuid) gameState.uuid = generateUUID();
         showToast("🔒 تم قفل اسمك نهائيًا مع توليد كود الشهادة");
     }
-
     const totalAllStages = window.stagesDatabase.nahw.length + window.stagesDatabase.sarf.length;
     if (getTotalCompletedStages() >= totalAllStages) {
         setTimeout(() => { showToast("🎉 مبروك! أكملت جميع المراحل — يمكنك استخراج شهادتك الآن!"); }, 2500);
     }
-
     saveState();
 }
-
-function restartCurrentStage() {
-    if (!currentStageData) { goToDashboard(); return; }
-    startStageQuiz(currentStageData.id);
-}
-
+function restartCurrentStage() { if (!currentStageData) { goToDashboard(); return; } startStageQuiz(currentStageData.id); }
 function confirmQuitQuiz() {
-    if (confirm("هل أنت متأكد من إنهاء المرحلة؟ سيتم حفظ ما أنجزته.")) {
-        // العودة خطوة للخلف في التاريخ (سيتم اعتراضها بواسطة popstate)
-        history.back();
-    }
+    if (confirm("هل أنت متأكد من إنهاء المرحلة؟ سيتم حفظ ما أنجزته.")) { history.back(); }
 }
-
-function openCertificate() {
-    if (!gameState.studentName) { showToast("الرجاء إدخال اسمك أولاً"); return; }
-    window.open('certificate.html', '_blank');
-}
-
+function openCertificate() { if (!gameState.studentName) { showToast("الرجاء إدخال اسمك أولاً"); return; } window.open('certificate.html', '_blank'); }
 function openRulesModal() { document.getElementById('rules-modal').classList.remove('hidden'); }
 function closeRulesModal() { document.getElementById('rules-modal').classList.add('hidden'); }
-function openResetModal() {
-    document.getElementById('reset-modal').classList.remove('hidden');
-    document.getElementById('reset-code-input').value = "";
-    document.getElementById('reset-error').classList.add('hidden');
-}
+function openResetModal() { document.getElementById('reset-modal').classList.remove('hidden'); document.getElementById('reset-code-input').value = ""; document.getElementById('reset-error').classList.add('hidden'); }
 function closeResetModal() { document.getElementById('reset-modal').classList.add('hidden'); }
-
 function confirmReset() {
     const entered = document.getElementById('reset-code-input').value.trim();
     if (entered !== RESET_CODE) { document.getElementById('reset-error').classList.remove('hidden'); return; }
-    
     localStorage.removeItem(CONFIG.STORAGE_KEY);
     gameState = {
         studentName: "", nameLocked: false, uuid: "", hearts: CONFIG.MAX_HEARTS, score: 0, streak: 0,
         currentTrack: null, currentStageId: null, currentLevel: 1,
-        tracks: {
-            nahw: { unlockedStages: [1], completedStages: [], stageProgress: {} },
-            sarf: { unlockedStages: [1], completedStages: [], stageProgress: {} }
-        },
+        tracks: { nahw: { unlockedStages: [1], completedStages: [], stageProgress: {} }, sarf: { unlockedStages: [1], completedStages: [], stageProgress: {} } },
         lastHeartRegenTime: Date.now(), version: CONFIG.STATE_VERSION
     };
-
-    closeResetModal(); showToast("✅ تم تصفير كل شيء بنجاح");
-    setTimeout(() => { location.reload(); }, 1200);
+    closeResetModal(); showToast("✅ تم تصفير كل شيء بنجاح"); setTimeout(() => { location.reload(); }, 1200);
 }
-
 function showToast(message) {
     const toast = document.createElement('div');
     toast.className = "fixed top-6 left-1/2 transform -translate-x-1/2 bg-emerald-600 text-white px-6 py-3 rounded-2xl shadow-2xl z-[60] text-sm font-bold flex items-center gap-3 border border-emerald-400/40 animate-fade-in";
     toast.innerHTML = `<i class="fa-solid fa-circle-info text-lg"></i> <span>${message}</span>`;
-    document.body.appendChild(toast);
-    setTimeout(() => toast.remove(), 3500);
+    document.body.appendChild(toast); setTimeout(() => toast.remove(), 3500);
 }
 
 window.addEventListener('load', function () {
-    loadSavedState();
-    regenHearts();
-    updateGlobalHeader();
-
-    const input = document.getElementById('student-name-input');
-    const lockIcon = document.getElementById('name-lock-icon');
-
+    loadSavedState(); regenHearts(); updateGlobalHeader();
+    const input = document.getElementById('student-name-input'); const lockIcon = document.getElementById('name-lock-icon');
     if (gameState.studentName) input.value = gameState.studentName;
     if (gameState.nameLocked) {
         input.disabled = true; input.classList.add('opacity-60', 'cursor-not-allowed');
         if (lockIcon) lockIcon.classList.remove('hidden');
-    } else {
-        if (lockIcon) lockIcon.classList.add('hidden');
-    }
-    
-    // دائماً ابدأ بشاشة الترحيب (وسيقوم الكود بتعبئة الاسم تلقائياً إن وجد)
-history.replaceState({ screen: 'welcome' }, '', '#welcome');
-goToWelcome(true);
-
+    } else { if (lockIcon) lockIcon.classList.add('hidden'); }
+    history.replaceState({ screen: 'welcome' }, '', '#welcome'); goToWelcome(true);
     processSyncQueue();
 });
-
-// ============================================================
-// 🚀 التقاط زر الرجوع في المتصفح (History API)
-// ============================================================
 window.addEventListener('popstate', function(event) {
     const state = event.state;
     if (!state) {
-        if (gameState.studentName) goToDashboard(true);
-        else goToWelcome(true);
-    } else if (state.screen === 'welcome') {
-        goToWelcome(true);
-    } else if (state.screen === 'dashboard') {
-        goToDashboard(true);
-    } else if (state.screen === 'track') {
-        openTrack(state.track, true);
-    } else if (state.screen === 'training') {
-        openTrainingArena(true);
-    } else if (state.screen === 'quiz') {
-        // إذا ضغط الطالب زر الرجوع أثناء اللعب، نعيده لخريطة المراحل
-        if (confirm("هل أنت متأكد من إنهاء المرحلة؟ سيتم حفظ ما أنجزته.")) {
-            openTrack(gameState.currentTrack, true);
-        } else {
-            // إذا رفض، نعيد الحالة للاختبار
-            history.pushState({ screen: 'quiz', track: gameState.currentTrack }, '', '#quiz');
-        }
+        if (gameState.studentName) goToDashboard(true); else goToWelcome(true);
+    } else if (state.screen === 'welcome') { goToWelcome(true); } 
+    else if (state.screen === 'dashboard') { goToDashboard(true); } 
+    else if (state.screen === 'track') { openTrack(state.track, true); } 
+    else if (state.screen === 'training') { openTrainingArena(true); } 
+    else if (state.screen === 'quiz') {
+        if (confirm("هل أنت متأكد من إنهاء المرحلة؟ سيتم حفظ ما أنجزته.")) { openTrack(gameState.currentTrack, true); } 
+        else { history.pushState({ screen: 'quiz', track: gameState.currentTrack }, '', '#quiz'); }
     }
 });
 
-// ============================================================
-// 🚀 كود المزامنة مع Google Sheets ونظام IndexedDB
-// ============================================================
-
-const DB_NAME = 'NahwSarfQueue';
-const STORE_NAME = 'attempts_queue';
-
+const DB_NAME = 'NahwSarfQueue'; const STORE_NAME = 'attempts_queue';
 function initSyncDB() {
     return new Promise((resolve, reject) => {
         const request = indexedDB.open(DB_NAME, 1);
         request.onupgradeneeded = (e) => {
             const db = e.target.result;
-            if (!db.objectStoreNames.contains(STORE_NAME)) {
-                db.createObjectStore(STORE_NAME, { keyPath: 'event_id' });
-            }
+            if (!db.objectStoreNames.contains(STORE_NAME)) { db.createObjectStore(STORE_NAME, { keyPath: 'event_id' }); }
         };
         request.onsuccess = (e) => resolve(e.target.result);
         request.onerror = (e) => reject(e.target.error);
     });
 }
-
 async function queueAttempt(attemptData) {
     try {
-        const db = await initSyncDB();
-        const tx = db.transaction(STORE_NAME, 'readwrite');
-        const store = tx.objectStore(STORE_NAME);
-        
+        const db = await initSyncDB(); const tx = db.transaction(STORE_NAME, 'readwrite'); const store = tx.objectStore(STORE_NAME);
         attemptData.event_id = crypto.randomUUID ? crypto.randomUUID() : Date.now().toString() + Math.random().toString(36).substr(2, 9);
         attemptData.app_version = CONFIG.STATE_VERSION;
-        
         store.put(attemptData);
-        
-        tx.oncomplete = () => {
-            processSyncQueue();
-        };
-    } catch (error) {
-        console.error("❌ فشل حفظ المحاولة محلياً:", error);
-    }
+        tx.oncomplete = () => { processSyncQueue(); };
+    } catch (error) { console.error("❌ فشل حفظ المحاولة محلياً:", error); }
 }
-
 async function processSyncQueue() {
     if (!navigator.onLine) return;
-
     try {
-        const db = await initSyncDB();
-        const tx = db.transaction(STORE_NAME, 'readonly');
-        const store = tx.objectStore(STORE_NAME);
+        const db = await initSyncDB(); const tx = db.transaction(STORE_NAME, 'readonly'); const store = tx.objectStore(STORE_NAME);
         const getAllRequest = store.getAll();
-
         getAllRequest.onsuccess = async () => {
-            const attempts = getAllRequest.result;
-            if (attempts.length === 0) return;
-
+            const attempts = getAllRequest.result; if (attempts.length === 0) return;
             for (const attempt of attempts) {
                 try {
-                    await fetch(WEB_APP_URL, {
-                        method: 'POST',
-                        mode: 'no-cors',
-                        headers: { 'Content-Type': 'text/plain' },
-                        body: JSON.stringify(attempt)
-                    });
-
-                    const deleteTx = db.transaction(STORE_NAME, 'readwrite');
-                    deleteTx.objectStore(STORE_NAME).delete(attempt.event_id);
-                    
-                } catch (err) {
-                    console.warn("⚠️ فشل الإرسال، ستبقى المحاولة في قائمة الانتظار:", err);
-                    break; 
-                }
+                    await fetch(WEB_APP_URL, { method: 'POST', mode: 'no-cors', headers: { 'Content-Type': 'text/plain' }, body: JSON.stringify(attempt) });
+                    const deleteTx = db.transaction(STORE_NAME, 'readwrite'); deleteTx.objectStore(STORE_NAME).delete(attempt.event_id);
+                } catch (err) { console.warn("⚠️ فشل الإرسال، ستبقى المحاولة في قائمة الانتظار:", err); break; }
             }
         };
-    } catch (error) {
-        console.error("❌ خطأ في عملية المزامنة:", error);
-    }
+    } catch (error) { console.error("❌ خطأ في عملية المزامنة:", error); }
 }
-
 window.addEventListener('online', processSyncQueue);
