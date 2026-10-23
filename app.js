@@ -869,14 +869,9 @@ window.addEventListener('load', function () {
         if (lockIcon) lockIcon.classList.add('hidden');
     }
     
-    // إعداد الحالة الأولى في تاريخ المتصفح
-    if (gameState.studentName) {
-        history.replaceState({ screen: 'dashboard' }, '', '#dashboard');
-        goToDashboard(true);
-    } else {
-        history.replaceState({ screen: 'welcome' }, '', '#welcome');
-        goToWelcome(true);
-    }
+    // دائماً ابدأ بشاشة الترحيب (وسيقوم الكود بتعبئة الاسم تلقائياً إن وجد)
+history.replaceState({ screen: 'welcome' }, '', '#welcome');
+goToWelcome(true);
 
     processSyncQueue();
 });
